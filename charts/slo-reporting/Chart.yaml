@@ -3,7 +3,7 @@ name: slo-reporting
 description: SLO Reporting
 type: application
 version: "0.1.0"
-appVersion: "0.1.0"
+appVersion: "0.1.7"
 #----
 keywords:
   - colenio
