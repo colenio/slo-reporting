@@ -3,8 +3,7 @@ name: helm-release
 on:
   push:
     branches: [main]
-    paths:
-      - "charts/**"
+    paths: ["charts/**", "!**/*.md"]
   # TODO: For now also enable manual runs
   workflow_dispatch:
   # # https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows#release
