@@ -79,14 +79,14 @@ jobs:
           docker-compose push ${COMPONENT}
           docker push ${CR_BASE}/${COMPONENT}:latest
       - name: Package & Push helm chart
-        working-directory: _devops/charts
+        working-directory: ${{ inputs.component }}
         run: |
           set -ex
-          if [ ! -d ${{ inputs.component }} ]; then
+          if [ ! -d chart ]; then
             echo "No Helm chart for '${{ inputs.component }}' found"
             exit 0
           fi
-          pushd ${{ inputs.component }}
+          pushd chart
           helm lint .
           helm package --version=${BUILD_VERSION} --app-version=${BUILD_VERSION} -u .
           echo ${{ secrets.crToken }} | helm registry login -u ${{ github.actor }} --password-stdin ${{ inputs.cr }}
