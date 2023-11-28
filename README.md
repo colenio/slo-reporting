@@ -42,6 +42,7 @@ Install
 
 - [IntelliJ IDEA](https://www.jetbrains.com/idea/)
   - [Rust bundle](https://plugins.jetbrains.com/bundles/3-rust-bundle)
+- [RustRover](https://www.jetbrains.com/rust/)
 - [VisualStudio Code](https://code.visualstudio.com/)
   - [Rust extension](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust)
 

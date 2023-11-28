@@ -21,7 +21,7 @@ log = "0.4"
 tokio = { version = "1", features = ["full"] } # https://crates.io/crates/tokio
 
 prometheus-http-query = "0" # https://crates.io/crates/prometheus-http-query
-csv = "1"
+csv = "1" # https://crates.io/crates/csv
 
 [profile.test]
 inherits = "dev"

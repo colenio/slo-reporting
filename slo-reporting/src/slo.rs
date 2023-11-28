@@ -50,7 +50,10 @@ impl Objective {
 
     fn midnight(to: Option<DateTime<Utc>>) -> DateTime<Utc> {
         let safe_to = to.unwrap_or_else(Utc::now);
-        let mut result = safe_to.date().and_hms(0, 0, 0);
+        let mut result = safe_to.date_naive()
+            .and_hms_opt(0, 0, 0)
+            .unwrap()
+            .and_utc();
         if result > safe_to {
             result -= chrono::Duration::days(1);
         }
