@@ -1,0 +1,15 @@
+# https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "slo-reporting.fullname" . }}
+  labels:
+    {{- include "slo-reporting.labels" . | nindent 4 }}
+  annotations:
+    timestamp: "{{ date "20060102150405" now }}"
+data:
+  STAGE: {{ .Values.config.stage }}
+  RUST_LOG: {{ .Values.config.logging.level }}
+  RUST_BACKTRACE: "full"
+  PROMETHEUS: {{ .Values.config.prometheus.url }}
+  ARCHIVE: {{ include "slo-reporting.archivePath" . }}

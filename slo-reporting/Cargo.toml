@@ -1,0 +1,35 @@
+# cargo-features = ["profile-rustflags"]
+
+[package]
+name = "slo_reporting"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+async-trait = "0.1"
+chrono = { version ="0.4", features = ["serde"] }
+humantime = "2"
+humantime-serde = "1"
+serde = "1"
+serde_derive = "1"
+serde_json = "1"
+config = "0.13"
+env_logger = "0.10"
+log = "0.4"
+tokio = { version = "1", features = ["full"] } # https://crates.io/crates/tokio
+
+prometheus-http-query = "0" # https://crates.io/crates/prometheus-http-query
+csv = "1"
+
+[profile.test]
+inherits = "dev"
+# rustflags = ["-Cinstrument-coverage"]
+
+[profile.release]
+# https://kerkour.com/optimize-rust-binary-size
+# Optimize for small binary size.
+opt-level = 'z' # Optimize for size
+lto = true # Link Time Optimization
+codegen-units = 1 # Reduce codegen units

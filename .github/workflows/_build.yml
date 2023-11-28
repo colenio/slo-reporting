@@ -1,0 +1,93 @@
+name: _build
+
+on: # https://docs.github.com/en/actions/learn-github-actions/reusing-workflows
+  workflow_call:
+    inputs:
+      runs-on:
+        description: The default build-agent
+        type: string
+        required: false
+        # See https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
+        default: "ubuntu-latest"
+      component:
+        description: The component to build & deploy
+        type: string
+        required: true
+      cr:
+        # https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry
+        description: The container registry to use (default is GitHub)
+        type: string
+        required: false
+        default: ghcr.io
+    # https://docs.github.com/en/actions/learn-github-actions/reusing-workflows#using-outputs-from-a-reusable-workflow
+    outputs:
+      version:
+        description: The built version
+        value: ${{ jobs.version.outputs.semver }}
+    secrets:
+      crToken:
+        required: true
+
+# https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#defaults
+defaults:
+  run:
+    shell: bash
+
+# https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#env
+env:
+  COMPONENT: ${{ inputs.component }}
+
+# https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobs
+jobs:
+  version:
+    runs-on: ${{ inputs.runs-on }}
+    outputs: # NOTE: We need the output in other jobs
+      semver: ${{ steps.gitversion.outputs.semVer }}
+    steps:
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.10.2
+        with:
+          versionSpec: "5.x"
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # For gitversion
+      # https://github.com/GitTools/actions/blob/main/docs/examples/github/gitversion/index.md
+      - id: gitversion
+        name: Determine Version
+        uses: gittools/actions/gitversion/execute@v0.10.2
+        with:
+          useConfigFile: true
+
+  build:
+    runs-on: ${{ inputs.runs-on }}
+    needs: version
+    env:
+      CR_BASE: "${{ inputs.cr }}/${{ github.repository }}"
+      GITVERSION_SEMVER: ${{ needs.version.outputs.semver }}
+      GIT_COMMIT: ${{ github.sha }}
+      BUILD_VERSION: ${{ needs.version.outputs.semver }}
+    steps:
+      #------
+      - uses: actions/checkout@v4
+      - name: Build & Push container image
+        run: |
+          set -ex
+          export BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          docker-compose build ${COMPONENT}
+          docker tag ${CR_BASE}/${COMPONENT}:${BUILD_VERSION} ${CR_BASE}/${COMPONENT}:latest
+          echo ${{ secrets.crToken }} | docker login ${CR_BASE} -u ${{ github.actor }} --password-stdin
+          docker-compose push ${COMPONENT}
+          docker push ${CR_BASE}/${COMPONENT}:latest
+      - name: Package & Push helm chart
+        working-directory: _devops/charts
+        run: |
+          set -ex
+          if [ ! -d ${{ inputs.component }} ]; then
+            echo "No Helm chart for '${{ inputs.component }}' found"
+            exit 0
+          fi
+          pushd ${{ inputs.component }}
+          helm lint .
+          helm package --version=${BUILD_VERSION} --app-version=${BUILD_VERSION} -u .
+          echo ${{ secrets.crToken }} | helm registry login -u ${{ github.actor }} --password-stdin ${{ inputs.cr }}
+          helm push ${COMPONENT}-${BUILD_VERSION}.tgz oci://${{ inputs.cr }}/${{ github.repository }}/helm

@@ -1,0 +1,45 @@
+---
+#--------
+## Configuration settings
+##
+config:
+  # -- The deployment stage, e.g. `integration, stage, production`
+  stage: integration
+  cronjob:
+    enabled: true
+    # -- The cronjob schedule for running the job (default: nightly at 2AM)
+    schedule: "0 23 * * *"
+  prometheus:
+    url: http://prometheus-community-kube-prometheus.observability:9090
+  azure:
+    storage:
+      # -- Name of Azure Storage Account to use
+      account: stacmedevbackup
+      # -- Access Key of Azure Storage Account
+      key: "-unset-"
+      # -- Azure File Share to store slo reports
+      azurefileshare: backup
+      # -- Mount path in pod
+      mountPath: /data
+  logging:
+    level: INFO
+#--------
+image:
+  repository: ghcr.io/colenio/slo-reporting
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+resources:
+  limits:
+    cpu: 10m
+    memory: 10Mi
+  requests:
+    cpu: 10m
+    memory: 10Mi

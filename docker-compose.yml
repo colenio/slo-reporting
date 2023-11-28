@@ -1,0 +1,13 @@
+version: "3.7"
+
+x-buildargs: &buildargs
+  GIT_COMMIT: ${GIT_COMMIT:-'git-commit'}
+  BUILD_VERSION: ${BUILD_VERSION:-'semver'}
+
+services:
+  slo-reporting:
+    image: ${CR_BASE}/slo-reporting:${GITVERSION_SEMVER:-latest}
+    build:
+      context: ./slo-reporting
+      args:
+        <<: *buildargs

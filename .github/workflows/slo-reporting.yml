@@ -1,0 +1,18 @@
+name: slo-reporting
+on:
+  push:
+    branches: [main]
+    paths: ["slo-reporting/**", "!**/*.md"]
+  pull_request:
+    branches: [main]
+    paths: ["slo-reporting/**", "!**/*.md"]
+  #--- TODO: For now also enable manual runs
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/_build.yml
+    with:
+      component: slo-reporting
+    secrets:
+      crToken: ${{ secrets.GITHUB_TOKEN }}

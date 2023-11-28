@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/.github/workflows"
+    batch-size: 20
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "cargo"
+    directory: "/slo-reporting"
+    batch-size: 20
+    schedule:
+      interval: "weekly"

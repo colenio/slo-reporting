@@ -1,0 +1,10 @@
+prometheus: http://localhost:9090
+archive: ./data/slo-reporting.csv
+slo:
+  - name: "myservice-uptime"
+    display_name: "My Service Uptime"
+    goal: 98.0
+    rolling_period: 1w
+    calendar_period: 30d
+    query: 100 * sum(min_over_time(probe_success{instance=~"myservice.+"}[15m])) by (instance)
+    step: 1d

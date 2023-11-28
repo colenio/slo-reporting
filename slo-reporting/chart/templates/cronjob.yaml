@@ -1,0 +1,50 @@
+{{- if .Values.config.cronjob.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "slo-reporting.fullname" . }}
+  labels:
+    {{- include "slo-reporting.labels" . | nindent 4 }}
+  annotations:
+    # cf.: https://sanderknape.com/2019/03/kubernetes-helm-configmaps-changes-deployments/
+    checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+spec:
+  concurrencyPolicy: Forbid
+  schedule: {{ .Values.config.cronjob.schedule }}
+  jobTemplate:
+    spec:
+      # https://kubernetes.io/docs/concepts/workloads/controllers/job/
+      template:
+        metadata:
+          {{- with .Values.podAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          labels:
+            {{- include "slo-reporting.labels" . | nindent 12 }}
+        spec:
+          # This pod should only Run once to completion
+          # 'Never' instead of 'OnFailure' will keep the failed pod so one can inspect logs
+          restartPolicy: Never
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          containers:
+            - name: {{ .Chart.Name }}
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              resources:
+                {{- toYaml .Values.resources | nindent 16 }}
+              envFrom:
+                - configMapRef:
+                    name: {{ include "slo-reporting.fullname" . }}
+              volumeMounts:
+                - name: azurefileshare
+                  mountPath: {{ .Values.config.azure.storage.mountPath }}
+          volumes:
+            - name: azurefileshare
+              azureFile:
+                secretName: {{ include "slo-reporting.secretName" . }}
+                shareName: {{ .Values.config.azure.storage.azurefileshare }}
+{{- end }}
