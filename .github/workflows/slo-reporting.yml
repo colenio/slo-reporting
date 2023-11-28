@@ -13,7 +13,7 @@ defaults:
 
 # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobs
 jobs:
-  version:
+  build:
     runs-on: "ubuntu-latest"
     outputs: # NOTE: We need the output in other jobs
       semver: ${{ steps.gitversion.outputs.semVer }}
