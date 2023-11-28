@@ -1,3 +1,5 @@
+[![slo-reporting](https://github.com/colenio/slo-reporting/actions/workflows/slo-reporting.yml/badge.svg)](https://github.com/colenio/slo-reporting/actions/workflows/slo-reporting.yml) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/slo-reporting)](https://artifacthub.io/packages/search?repo=slo-reporting)
+
 # SLO Reporting
 
 Excel compatible SLO reporting tool for Prometheus.
