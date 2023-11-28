@@ -6,8 +6,8 @@ x-buildargs: &buildargs
 
 services:
   slo-reporting:
-    image: ${CR_BASE}/slo-reporting:${GITVERSION_SEMVER:-latest}
+    image: ${CR_BASE}/slo-reporting:${BUILD_VERSION:-latest}
     build:
-      context: ./slo-reporting
+      context: ./src
       args:
         <<: *buildargs

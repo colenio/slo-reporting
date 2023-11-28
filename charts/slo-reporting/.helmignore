@@ -21,10 +21,3 @@
 .idea/
 *.tmproj
 .vscode/
-
-#--- Ignore stage-specific values
-values.*.yaml
-
-#--- Ignore env-specific templates  used not during packaging (build) but during deployment
-*.njk
-nj.json

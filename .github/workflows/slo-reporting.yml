@@ -2,17 +2,46 @@ name: slo-reporting
 on:
   push:
     branches: [main]
-    paths: ["slo-reporting/**", "!**/*.md"]
-  pull_request:
-    branches: [main]
-    paths: ["slo-reporting/**", "!**/*.md"]
+    paths: ["src/**", "!**/*.md"]
   #--- TODO: For now also enable manual runs
   workflow_dispatch:
 
+# https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#defaults
+defaults:
+  run:
+    shell: bash
+
+# https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobs
 jobs:
-  build:
-    uses: ./.github/workflows/_build.yml
-    with:
-      component: slo-reporting
-    secrets:
-      crToken: ${{ secrets.GITHUB_TOKEN }}
+  version:
+    runs-on: "ubuntu-latest"
+    outputs: # NOTE: We need the output in other jobs
+      semver: ${{ steps.gitversion.outputs.semVer }}
+    steps:
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.10.2
+        with:
+          versionSpec: "5.x"
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # For gitversion
+      # https://github.com/GitTools/actions/blob/main/docs/examples/github/gitversion/index.md
+      - id: gitversion
+        name: Determine Version
+        uses: gittools/actions/gitversion/execute@v0.10.2
+        with:
+          useConfigFile: true
+      - name: Build & Push container image
+        run: |
+          set -ex
+          export BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          docker-compose build ${COMPONENT}
+          docker tag ${CR_BASE}/${COMPONENT}:${BUILD_VERSION} ${CR_BASE}/${COMPONENT}:latest
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ${CR_BASE} -u ${{ github.actor }} --password-stdin
+          docker-compose push ${COMPONENT}
+          docker push ${CR_BASE}/${COMPONENT}:latest
+        env:
+          CR_BASE: "ghcr.io/${{ github.repository_owner }}"
+          COMPONENT: slo-reporting
+          BUILD_VERSION: ${{ steps.gitversion.outputs.semver }}
+          GIT_COMMIT: ${{ github.sha }}
