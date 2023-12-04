@@ -8,8 +8,12 @@ metadata:
   annotations:
     timestamp: "{{ date "20060102150405" now }}"
 data:
-  STAGE: {{ .Values.config.stage }}
-  RUST_LOG: {{ .Values.config.logging.level }}
-  RUST_BACKTRACE: "full"
-  PROMETHEUS: {{ .Values.config.prometheus.url }}
-  ARCHIVE: {{ include "slo-reporting.archivePath" . }}
+  settings.yaml: |-
+{{- with .Values.config }}
+    prometheus: {{ .prometheus.url }}
+    archive: {{ .bucket.path }}/{{ .bucket.output }}
+    slo:
+      {{- with .slo }}
+      {{- toYaml . | trim | nindent 6 }}
+      {{- end }}
+{{- end }}

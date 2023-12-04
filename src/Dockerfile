@@ -1,6 +1,7 @@
 #---
 # https://kerkour.com/rust-small-docker-image
-FROM rust:latest as builder-base
+# https://hub.docker.com/_/rust/tags
+FROM rust:bullseye as builder-base
 
 RUN rustup update && rustup component add clippy
 
@@ -18,8 +19,9 @@ RUN cargo clippy
 RUN cargo test
 
 #---
-#FROM debian:bullseye-slim as runtime
-FROM gcr.io/distroless/cc as runtime
+# https://github.com/GoogleContainerTools/distroless/blob/main/cc/README.md
+# NOTE: Using Debian 11, because 12 (Bookworm) removed libssl dependency
+FROM gcr.io/distroless/cc-debian11 as runtime
 
 ARG GIT_COMMIT=unknown
 ARG BUILD_DATE=unknown
@@ -49,5 +51,8 @@ WORKDIR /app
 # RUN apt-get update && apt-get install -y extra-runtime-dependencies && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /usr/src/app/target/release/slo_reporting ./
 COPY --from=builder /usr/src/app/config ./config
+
+ENV RUST_LOG INFO
+ENV RUST_BACKTRACE full
 
 CMD ["./slo_reporting"]

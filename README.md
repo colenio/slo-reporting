@@ -4,7 +4,32 @@
 
 Excel compatible SLO reporting tool for Prometheus.
 
-## Overview
+## Features
+
+## Prerequisites
+
+- Kubernetes cluster with [Prometheus](https://prometheus.io/)-compatible SLO-metrics
+- Azure Storage Account with a File Share
+- A [Kubernetes Secret](https://learn.microsoft.com/en-us/azure/aks/azure-csi-files-storage-provision#create-a-kubernetes-secret) with the following keys
+  - `azurestorageaccountname`: The name of the Azure Storage Account
+  - `azurestorageaccountkey`: The key of the Azure Storage Account
+
+See
+
+- [Create and use a volume with Azure Files in Azure Kubernetes Service (AKS)](https://learn.microsoft.com/en-us/azure/aks/azure-csi-files-storage-provision)
+
+## Usage
+
+The helm chart provides a simple way to deploy the tool to a Kubernetes cluster. It consists of a single pod running the tool as a cronjob.
+
+```shell
+helm repo add slo-reporting https://colenio.github.io/slo-reporting/
+helm install my-slo-reporting slo-reporting/slo-reporting --version 0.1.0 --values my-values.yaml
+```
+
+An alternative is to to create a Kubernetes cronjob manually. This allows for more fine-grained control over the output volume.
+
+### Local usage
 
 Run the tool
 

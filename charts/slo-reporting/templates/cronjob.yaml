@@ -36,15 +36,21 @@ spec:
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               resources:
                 {{- toYaml .Values.resources | nindent 16 }}
-              envFrom:
-                - configMapRef:
-                    name: {{ include "slo-reporting.fullname" . }}
               volumeMounts:
-                - name: azurefileshare
-                  mountPath: {{ .Values.config.azure.storage.mountPath }}
+                - name: config
+                  mountPath: /app/config
+                  readOnly: true
+                - name: bucket
+                  mountPath: {{ .Values.config.bucket.path }}
           volumes:
-            - name: azurefileshare
+            - name: config
+              configMap:
+                name: {{ include "slo-reporting.fullname" . }}
+                items:
+                  - key: settings.yaml
+                    path: settings.yaml
+            - name: bucket
               azureFile:
-                secretName: {{ include "slo-reporting.secretName" . }}
-                shareName: {{ .Values.config.azure.storage.azurefileshare }}
+                secretName: {{ .Values.config.bucket.secretName }}
+                shareName: {{ .Values.config.bucket.name }}
 {{- end }}

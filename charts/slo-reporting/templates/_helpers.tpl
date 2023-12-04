@@ -49,17 +49,3 @@ Selector labels
 app.kubernetes.io/name: {{ include "slo-reporting.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
-
-{{/*
-Define azure file share secret name
-*/}}
-{{- define "slo-reporting.secretName" -}}
-{{- printf "%s-%s" .Chart.Name "azure-fileshare" | replace "+" "_" | trunc 63 | trimSuffix "-" }}
-{{- end }}
-
-{{/*
-Define archive file name
-*/}}
-{{- define "slo-reporting.archivePath" -}}
-{{- printf "%s/%s/%s/%s-%s.csv" .Values.config.azure.storage.mountPath .Release.Namespace .Release.Name .Release.Name (date "2006" now) }}
-{{- end }}
