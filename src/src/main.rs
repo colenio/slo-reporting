@@ -29,7 +29,7 @@ async fn main() -> Result<(), Error> {
     let header = settings.slo.iter().map(|s| s.name.clone()).collect();
     let mut archive = Archive::new(header);
     let reader = Reader::from_path(&settings.archive);
-    if let Ok(..) = reader {
+    if reader.is_ok() {
         archive.read(reader.unwrap());
         log::info!("Read '{}'", settings.archive);
     }
