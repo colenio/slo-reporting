@@ -32,7 +32,7 @@ ARG BUILD_BUILDNUMBER=0.1.0
 LABEL org.opencontainers.image.created="${BUILD_DATE}" \
     org.opencontainers.image.url="https://github.com/colenio/slo-reporting" \
     org.opencontainers.image.source="https://github.com/colenio/slo-reporting" \
-    org.opencontainers.image.version="${BUILD_BUILDNUMBER}"\
+    org.opencontainers.image.version="${BUILD_VERSION}"\
     org.opencontainers.image.revision="${GIT_COMMIT}" \
     org.opencontainers.image.vendor="colenio" \
     org.opencontainers.image.documentation="https://github.com/colenio/slo-reporting" \
@@ -42,7 +42,6 @@ LABEL org.opencontainers.image.created="${BUILD_DATE}" \
 ENV GIT_COMMIT ${GIT_COMMIT}
 ENV BUILD_DATE ${BUILD_DATE}
 ENV BUILD_VERSION ${BUILD_VERSION}
-ENV BUILD_BUILDNUMBER ${BUILD_BUILDNUMBER}
 
 #---
 FROM runtime as final

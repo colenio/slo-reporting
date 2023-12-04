@@ -8,16 +8,16 @@ use serde_derive::{Serialize, Deserialize};
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Objective {
     pub name: String,
-    pub display_name: String,
-    #[serde(default)]
     pub query: String,
     #[serde(default)]
+    pub display_name: String,
+    #[serde(default = "Objective::default_goal")]
     pub goal: f64,
-    #[serde(with = "humantime_serde")]
+    #[serde(with = "humantime_serde", default = "Objective::default_rolling_period")]
     pub rolling_period: Duration,
-    #[serde(with = "humantime_serde")]
+    #[serde(with = "humantime_serde", default = "Objective::default_calendar_period")]
     pub calendar_period: Duration,
-    #[serde(with = "humantime_serde")]
+    #[serde(with = "humantime_serde", default = "Objective::default_step")]
     pub step: Duration,
     #[serde(default)]
     pub create_time: Option<DateTime<Utc>>,
@@ -34,6 +34,11 @@ impl Display for Objective {
 }
 
 impl Objective {
+    pub fn default_goal() -> f64{98.0}
+    pub fn default_rolling_period() -> Duration{humantime::parse_duration("7d").unwrap()}
+    pub fn default_calendar_period() -> Duration{humantime::parse_duration("30d").unwrap()}
+    pub fn default_step() -> Duration{humantime::parse_duration("1d").unwrap()}
+
     pub async fn range_of(&self, client: &Client, to: Option<DateTime<Utc>>) -> Result<RangeVector, prometheus_http_query::Error> {
         let safe_to = Self::midnight(to).timestamp();
         let from = safe_to - self.rolling_period.as_secs() as i64;

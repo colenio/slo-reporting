@@ -15,7 +15,7 @@ use archive::Archive;
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Error> {
     const PKG_NAME: &str = env!("CARGO_PKG_NAME");
-    let pkg_version: &str = option_env!("BUILD_BUILDNUMBER").unwrap_or("dev");
+    let pkg_version: &str = option_env!("BUILD_VERSION").unwrap_or("dev");
 
     env_logger::Builder::from_default_env()
         .target(Target::Stdout)
