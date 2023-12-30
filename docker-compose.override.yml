@@ -1,6 +1,28 @@
 version: "3.7"
 
+volumes:
+  prometheus-data:
+  grafana-data:
+
 services:
   prometheus: # https://hub.docker.com/r/prom/prometheus/tags
     image: prom/prometheus # :latest, :v2.48.1
     ports: ["9090:9090"]
+    volumes:
+      - ./prometheus/etc/:/etc/prometheus/
+      - prometheus-data:/prometheus/
+
+  alertmanager: # https://hub.docker.com/r/prom/alertmanager/tags
+    image: prom/alertmanager # :latest, :v0.26.0
+    ports: ["9093:9093"]
+
+  grafana: # https://hub.docker.com/r/grafana/grafana/tags
+    image: grafana/grafana # :latest, :10.2.3
+    ports: ["3000:3000"]
+    volumes:
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards/
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources/
+      - ./grafana/dashboards/:/var/lib/grafana/dashboards/      
+      - grafana-data:/var/lib/grafana/
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
