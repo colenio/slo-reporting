@@ -5,8 +5,8 @@ updates:
     batch-size: 20
     schedule:
       interval: "weekly"
-  - package-ecosystem: "cargo"
-    directory: "/slo-reporting"
+  - package-ecosystem: "pip"
+    directory: "/src"
     batch-size: 20
     schedule:
       interval: "weekly"

@@ -11,12 +11,10 @@ RUN pip install --no-cache-dir -r requirements-dev.txt
 COPY . .
 RUN python -m pytest --mypy --cov --cov-fail-under=75
 
-
 FROM deps as final
 COPY . .
-# Dummy dependency to force running the tests
+# Dummy dependency to prevent optimizing away the test stage (Buildkit)
 COPY --from=test /app/README.md ./README.md
-
 
 ENV TZ UTC
 ENV ENABLE_JSON_LOGGING true
