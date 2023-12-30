@@ -32,6 +32,20 @@ jobs:
         with:
           # version: v3.9.0
           token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Test helm chart
+        working-directory: chart/slo-reporting
+        run: |
+            set -ex
+            helm lint .
+            if [ -d "charts" ]; then
+              helm dependency update
+            fi
+            if [ -d "tests" ]; then
+              helm plugin install https://github.com/helm-unittest/helm-unittest.git
+              helm unittest -o tests/TEST-helm.xml -t JUnit .
+            fi
+  
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
         env:
