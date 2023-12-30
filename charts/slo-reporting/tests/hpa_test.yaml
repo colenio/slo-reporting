@@ -2,7 +2,9 @@ suite: test hpa
 templates:
   - hpa.yaml
 tests:
-  - it: should work
+  - it: should create hpa
+    set:
+      autoscaling.enabled: true
     asserts: # https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md#assertion-types
       - isKind:
           of: HorizontalPodAutoscaler

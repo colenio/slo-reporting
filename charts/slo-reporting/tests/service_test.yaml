@@ -2,7 +2,7 @@ suite: test service
 templates:
   - service.yaml
 tests:
-  - it: should work
+  - it: should create service
     release:
       name: my-release
     asserts: # https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md#assertion-types

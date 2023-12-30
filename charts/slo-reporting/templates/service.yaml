@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{include "slo-reporting.fullname" .}}
+  labels: {{- include "slo-reporting.labels" . | nindent 4}}
+spec:
+  type: {{.Values.service.type}}
+  ports:
+    - port: {{.Values.service.port}}
+      protocol: TCP
+      name: http
+  selector: {{- include "slo-reporting.selectorLabels" . | nindent 4}}

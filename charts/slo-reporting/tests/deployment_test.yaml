@@ -5,7 +5,7 @@ suite: test deployment
 templates:
   - deployment.yaml
 tests:
-  - it: should work
+  - it: should create deployment
     #set:
     #  image.tag: latest
     chart:
@@ -17,7 +17,7 @@ tests:
       # revision: 9
       # upgrade: true
     values:
-      - ../values.dev.yaml
+      - values.test.yaml
     asserts:
       - isKind:
           of: Deployment
@@ -43,28 +43,43 @@ tests:
       - equal: # imagePullSecret
           path: spec.template.spec.imagePullSecrets[0].name
           value: image-pull-secret
-      - equal: # environment variables
-          path: spec.template.spec.containers[0].env[0]
+      - equal: # volumeMounts
+          path: spec.template.spec.containers[0].volumeMounts
           value:
-            name: SPRING_PROFILES_ACTIVE
-            value: dev
+            - name: config
+              mountPath: /app/config
+              readOnly: true
+            - name: bucket
+              mountPath: /app/data
+      - equal: # volumes
+          path: spec.template.spec.volumes
+          value:
+            - name: config
+              configMap:
+                name: my-release-slo-reporting
+                items:
+                  - key: settings.yaml
+                    path: settings.yaml
+            - name: bucket
+              azureFile:
+                secretName: slo-reporting
+                shareName: backup
       - equal: # resources
           path: spec.template.spec.containers[0].resources
           value:
               limits:
-                memory: 500Mi
+                cpu: 10m
+                memory: 10Mi
               requests:
-                cpu: 500m
-                memory: 500Mi
+                cpu: 10m
+                memory: 10Mi
       - equal: # probes
-          path: spec.template.spec.containers[0].startupProbe.httpGet
+          path: spec.template.spec.containers[0].livenessProbe.httpGet
           value:
-            path: /actuator/health/liveness
-            port: 8080
+            path: /health
+            port: 8000
             scheme: HTTP
-      - equal:
-          path: spec.template.spec.containers[0].livenessProbe.httpGet.path
-          value: /actuator/health/liveness
+
       - equal:
           path: spec.template.spec.containers[0].readinessProbe.httpGet.path
-          value: /actuator/health/readiness
+          value: /health

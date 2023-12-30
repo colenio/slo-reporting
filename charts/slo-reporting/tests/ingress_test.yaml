@@ -6,7 +6,7 @@ tests:
     release:
       name: my-release
     values:
-      - ../values.dev.yaml
+      - values.test.yaml
     asserts: # https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md#assertion-types
       - isKind:
           of: Ingress
@@ -20,7 +20,7 @@ tests:
           value:
             hosts:
               - status.playground.colenio.com
-            secretName: my-release-slo-reporting-tls
+            secretName: slo-reporting-tls
       - equal:
           path: spec.rules[0]
           value:

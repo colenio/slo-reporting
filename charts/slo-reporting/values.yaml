@@ -40,13 +40,20 @@ nameOverride: ""
 fullnameOverride: ""
 podAnnotations: {}
 
-resources:
-  limits:
-    cpu: 10m
-    memory: 10Mi
-  requests:
-    cpu: 10m
-    memory: 10Mi
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""
+
+resources: {}
+
+# -- Auto scaling via [HPA](https://docs.microsoft.com/en-us/azure/aks/tutorial-kubernetes-scale#autoscale-pods)
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 4
+  #targetCPUUtilizationPercentage: 80 # Disable cpu metrics since no limit (see above)
+  targetMemoryUtilizationPercentage: 80
 
 # -- Networking
 service:

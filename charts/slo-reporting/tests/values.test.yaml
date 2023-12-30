@@ -1,0 +1,31 @@
+image:
+  repository: ghcr.io/colenio/slo-reporting
+imagePullSecrets:
+  - name: image-pull-secret
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+  hosts:
+    - host: status.playground.colenio.com
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: slo-reporting-tls
+      hosts:
+        - status.playground.colenio.com
+
+resources:
+  limits:
+    cpu: 10m
+    memory: 10Mi
+  requests:
+    cpu: 10m
+    memory: 10Mi
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true

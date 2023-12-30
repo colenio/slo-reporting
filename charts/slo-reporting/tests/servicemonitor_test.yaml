@@ -2,7 +2,7 @@ suite: test service monitor
 templates:
   - servicemonitor.yaml
 tests:
-  - it: should work
+  - it: should create service monitor
     set:
       metrics.enabled: true
       metrics.serviceMonitor.enabled: true
