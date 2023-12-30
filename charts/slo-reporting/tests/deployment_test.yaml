@@ -1,0 +1,70 @@
+# https://github.com/helm-unittest/helm-unittest?tab=readme-ov-file#get-started
+# Run tests using `helm unittest` or `untt` like this
+# `untt -o tests/TEST-helm.xml -t JUnit .`
+suite: test deployment
+templates:
+  - deployment.yaml
+tests:
+  - it: should work
+    #set:
+    #  image.tag: latest
+    chart:
+      version: 0.1.0
+      appVersion: 0.1.0
+    release:
+      name: my-release
+      namespace: my-namespace
+      # revision: 9
+      # upgrade: true
+    values:
+      - ../values.dev.yaml
+    asserts:
+      - isKind:
+          of: Deployment
+      - matchRegex:
+          path: metadata.name
+          pattern: -slo-reporting$
+      - equal: # labels
+          path: metadata.labels
+          value:
+            helm.sh/chart: slo-reporting-0.1.0
+            app.kubernetes.io/name: slo-reporting
+            app.kubernetes.io/instance: my-release
+            app.kubernetes.io/version: "0.1.0"
+            app.kubernetes.io/managed-by: Helm
+      - equal: # selector
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: slo-reporting
+            app.kubernetes.io/instance: my-release
+      - equal: # image
+          path: spec.template.spec.containers[0].image
+          value: ghcr.io/colenio/slo-reporting:0.1.0
+      - equal: # imagePullSecret
+          path: spec.template.spec.imagePullSecrets[0].name
+          value: image-pull-secret
+      - equal: # environment variables
+          path: spec.template.spec.containers[0].env[0]
+          value:
+            name: SPRING_PROFILES_ACTIVE
+            value: dev
+      - equal: # resources
+          path: spec.template.spec.containers[0].resources
+          value:
+              limits:
+                memory: 500Mi
+              requests:
+                cpu: 500m
+                memory: 500Mi
+      - equal: # probes
+          path: spec.template.spec.containers[0].startupProbe.httpGet
+          value:
+            path: /actuator/health/liveness
+            port: 8080
+            scheme: HTTP
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet.path
+          value: /actuator/health/liveness
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.path
+          value: /actuator/health/readiness

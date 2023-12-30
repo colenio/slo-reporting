@@ -3,6 +3,12 @@ version: "3.7"
 x-buildargs: &buildargs
   GIT_COMMIT: ${GIT_COMMIT:-'git-commit'}
   BUILD_VERSION: ${BUILD_VERSION:-'semver'}
+  BUILD_DATE: ${BUILD_DATE:-'build-date'}
+  # See GitHub predefined variables, cf.:
+  # - https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+  # OCI label schema, cf.: https://github.com/opencontainers/image-spec/blob/master/annotations.md
+  VENDOR: ${GITHUB_REPOSITORY_OWNER:-colenio}
+  SOURCE: ${GITHUB_SERVER_URL:-'https://github.com'}/${GITHUB_REPOSITORY:-'colenio/slo-reporting'}
 
 services:
   slo-reporting:
@@ -11,3 +17,4 @@ services:
       context: ./src
       args:
         <<: *buildargs
+    ports: ["8000:8000"]

@@ -1,0 +1,27 @@
+suite: test service
+templates:
+  - service.yaml
+tests:
+  - it: should work
+    release:
+      name: my-release
+    asserts: # https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md#assertion-types
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: my-release-slo-reporting
+      - equal:
+          path: spec.type
+          value: ClusterIP
+      - equal:
+          path: spec.ports[0]
+          value:
+            name: http
+            port: 8000
+            protocol: TCP
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/name: slo-reporting
+            app.kubernetes.io/instance: my-release

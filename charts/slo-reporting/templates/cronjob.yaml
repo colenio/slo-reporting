@@ -41,7 +41,7 @@ spec:
                   mountPath: /app/config
                   readOnly: true
                 - name: bucket
-                  mountPath: {{ .Values.config.bucket.path }}
+                  mountPath: /app/data
           volumes:
             - name: config
               configMap:

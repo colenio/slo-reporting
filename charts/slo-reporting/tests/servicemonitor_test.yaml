@@ -1,0 +1,19 @@
+suite: test service monitor
+templates:
+  - servicemonitor.yaml
+tests:
+  - it: should work
+    set:
+      metrics.enabled: true
+      metrics.serviceMonitor.enabled: true
+    asserts: # https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md#assertion-types
+      - isKind:
+          of: ServiceMonitor
+      - isAPIVersion:
+          of: monitoring.coreos.com/v1
+      - equal: # endpoints
+          path: spec.endpoints[0]
+          value:
+            port: http
+            path: "/actuator/prometheus"
+            interval: 30s

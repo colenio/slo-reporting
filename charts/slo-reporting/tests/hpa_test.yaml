@@ -1,0 +1,25 @@
+suite: test hpa
+templates:
+  - hpa.yaml
+tests:
+  - it: should work
+    asserts: # https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md#assertion-types
+      - isKind:
+          of: HorizontalPodAutoscaler
+      - isAPIVersion:
+          of: autoscaling/v2
+      - equal: # replicas
+          path: spec.minReplicas
+          value: 1
+      - equal: # replicas
+          path: spec.maxReplicas
+          value: 4
+      - equal: # metrics
+          path: spec.metrics[0]
+          value:
+            type: Resource
+            resource:
+              name: memory
+              target:
+                type: Utilization
+                averageUtilization: 80

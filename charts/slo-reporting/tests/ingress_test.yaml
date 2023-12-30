@@ -1,0 +1,36 @@
+suite: test ingress
+templates:
+  - ingress.yaml
+tests:
+  - it: should render ingress
+    release:
+      name: my-release
+    values:
+      - ../values.dev.yaml
+    asserts: # https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md#assertion-types
+      - isKind:
+          of: Ingress
+      - isAPIVersion:
+          of: networking.k8s.io/v1
+      - equal:
+          path: spec.ingressClassName
+          value: nginx
+      - equal:
+          path: spec.tls[0]
+          value:
+            hosts:
+              - status.playground.colenio.com
+            secretName: my-release-slo-reporting-tls
+      - equal:
+          path: spec.rules[0]
+          value:
+            host: status.playground.colenio.com
+            http:
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: my-release-slo-reporting
+                      port:
+                        number: 8000

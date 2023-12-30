@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="shortcut icon" href="/static/favico.png" />
+
+    {% block header %}{% endblock %}
+  </head>
+
+  <body>
+    <header>
+      <nav
+        class="navbar is-fixed-top is-dark"
+        role="navigation"
+        aria-label="main navigation"
+      >
+        <div class="navbar-brand">
+          <a class="navbar-item" href="/">
+            <img src="/static/img/brand.png" />
+          </a>
+
+          <a
+            role="button"
+            class="navbar-burger"
+            aria-label="menu"
+            aria-expanded="false"
+            data-target="navbar"
+          >
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+          </a>
+        </div>
+
+        <div id="navbar" class="navbar-menu">
+          <div class="navbar-start">
+            <a class="navbar-item" href="/">Home</a>
+          </div>
+
+          <div class="navbar-end">
+            <div class="navbar-item"></div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section has-navbar-fixed-top">
+        <div class="content">{% block content %}{% endblock %}</div>
+      </section>
+    </main>
+
+    <footer class="footer mt-auto is-light">
+      <div class="container has-text-centered">
+        &copy; {% now 'utc', '%Y' %} | <a href="/about">About</a> |
+        <a href="/docs">API Docs</a> |
+        <a href="/metrics">Metrics</a>
+      </div>
+    </footer>
+
+    {% block javascript %}{% endblock %}
+  </body>
+</html>

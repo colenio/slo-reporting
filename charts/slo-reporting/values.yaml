@@ -12,13 +12,11 @@ config:
     url: http://prometheus-community-kube-prometheus.observability:9090
   # -- List of SLOs to report on
   slo:
-    - name: "myservice-uptime" # required
-      query: 100 * sum(min_over_time(probe_success{instance=~"myservice.+"}[15m])) by (instance) # promql, required
-      display_name: "My Service Uptime" # optional
-      goal: 98.0 # 98% uptime, default
-      rolling_period: 1w # 1 week, default
-      calendar_period: 30d # 30 days, default
-      step: 1d # 1 day, default
+    - name: "prometheus-uptime" # required
+      query: 100 * sum(min_over_time(up{job="prometheus"}[15m])) by (job) # promql, required
+      goal: 99.9 # 99.9% uptime, default
+      rolling_period: P1W # 1 week, default
+      step: P1D # 1 day, default
   bucket:
     # -- Path to the archive file
     output: slo-reporting.csv
@@ -49,3 +47,30 @@ resources:
   requests:
     cpu: 10m
     memory: 10Mi
+
+# -- Networking
+service:
+  port: 8000
+  type: ClusterIP
+
+ingress:
+  enabled: false
+  className: "" # nginx
+  annotations: {}
+  hosts: []
+  tls: []
+
+metrics:
+  enabled: true
+  serviceMonitor: # TODO: document
+    # -- Enable a [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#servicemonitorspec)
+    enabled: true
+    namespace: ""
+    additionalLabels: []
+    scrapeInterval: 30s
+    honorLabels: false
+    relabelings: []
+    metricRelabelings: []
+    jobLabel: ""
+    namespaceSelector: {}
+    targetLabels: []

@@ -1,6 +1,6 @@
 version: "3.7"
 
 services:
-  prometheus: # https://hub.docker.com/r/prom/prometheus
-    image: prom/prometheus:v2.48.0
+  prometheus: # https://hub.docker.com/r/prom/prometheus/tags
+    image: prom/prometheus # :latest, :v2.48.1
     ports: ["9090:9090"]
