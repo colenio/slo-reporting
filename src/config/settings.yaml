@@ -1,4 +1,5 @@
 metrics:
+  enabled: True
   prometheus:
     url: http://localhost:9090
   archive: ./data/slo-reporting.csv
@@ -12,3 +13,14 @@ metrics:
 #    - name: "status-uptime"
 #      goal: 99.9
 #      query: 100 * sum(min_over_time(up{job="prometheus"}[15m]))
+systems_health:
+  enabled: True
+  query_interval: 60
+  queriers:
+    azure:
+      - name: azure
+        subscriptionID: XXXXXX-XXXX-XXXXXX-XXXX-XXXXXX
+    prometheus:
+      - name: prom
+        url: http://localhost:9090
+        query: "ALERTS{}"

@@ -4,7 +4,7 @@ from typing import List, Type, Tuple, Any, Dict, Optional
 
 import yaml
 from prometheus_api_client import PrometheusConnect
-from pydantic import BaseModel, SecretStr
+from pydantic import BaseModel, SecretStr, PositiveInt
 from pydantic.fields import FieldInfo, Field
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource
 
@@ -54,7 +54,7 @@ class Prometheus(BaseModel):
     _client: Optional[PrometheusConnect] = None
 
     @property
-    def client(self):
+    def client(self) -> PrometheusConnect:
         if self._client is None:
             auth = (self.user, self.password.get_secret_value())
             self._client = PrometheusConnect(url=self.url, auth=auth, disable_ssl=self.ssl_verify)
@@ -68,6 +68,7 @@ class ServiceLevelObjective(BaseModel):
 
 
 class Metrics(BaseModel):
+    enabled: bool = True
     prometheus: Prometheus = Prometheus()
     archive: str = Field(default="data/archive.csv", description="Path to the archive (CSV file)")
     window: timedelta = Field(default=timedelta(weeks=1), description="Rolling window")
@@ -92,6 +93,30 @@ class Metrics(BaseModel):
         return dt
 
 
+class AzureQuerier(BaseModel):
+    name: str = Field(default="azure-querier", description="Name of the Querier")
+    subscriptionID: str = Field(description="SubscriptionID of the Azure-Resource to query")
+
+
+class PrometheusQuerier(BaseModel):
+    name: str = Field(default="prometheus-querier", description="Name of the Querier")
+    url: str = Field(default="http://localhost:9090", description="URL of the Prometheus server")
+    user: str = Field(default="prometheus-user", description="Username for the Prometheus server")
+    password: SecretStr = Field(default=SecretStr("password"), description="Password for the Prometheus server")
+    ssl_verify: bool = Field(default=False, description="Verify SSL certificate")
+    query: str = Field(default="ALERTS{}", description="Query which should be executed")
+
+
+class Queriers(BaseModel):
+    azure: List[AzureQuerier] = Field(default_factory=list, description="List of Azure Queriers")
+    prometheus: List[PrometheusQuerier] = Field(default_factory=list, description="List of Prometheus Queriers")
+
+
+class SystemsHealth(BaseModel):
+    enabled: bool = True
+    queriers: Queriers = Queriers()
+    query_interval: PositiveInt = Field(default=60,description="Interval in which the alert sources should be queried (in Seconds)")
+
 class Settings(BaseSettings):
     api_base: str = "/api"
     project: str = "slo-reporting"
@@ -99,6 +124,7 @@ class Settings(BaseSettings):
     version: str = "0.1.0"
     git_commit: str = "-local-"
     metrics: Metrics = Metrics()
+    systems_health: SystemsHealth = SystemsHealth()
 
     # https://docs.pydantic.dev/latest/concepts/pydantic_settings/#adding-sources
     @classmethod
