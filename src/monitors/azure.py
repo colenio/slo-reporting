@@ -7,7 +7,6 @@ from azure.mgmt.alertsmanagement import AlertsManagementClient
 from azure.mgmt.alertsmanagement.models import MonitorCondition
 
 from models.settings import AzureMonitorConfig
-from monitors import Alert
 from monitors.models import Alert, Monitor
 
 
