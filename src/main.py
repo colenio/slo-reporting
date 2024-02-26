@@ -26,18 +26,17 @@ def create_app() -> FastAPI:
 
 
 # TODO: check if there's a supertype which might be returned
-def create_querier_scheduler(querierOrchestrator: QuerierOrchestrator) -> BackgroundScheduler:
+def create_querier_scheduler(querierOrchestrator: QuerierOrchestrator,queryInterval: int) -> BackgroundScheduler:
     scheduler = BackgroundScheduler()
 
-    for querier in querierOrchestrator.queriers:
-        scheduler.add_job(querierOrchestrator.execute, 'interval', seconds=10)
+    scheduler.add_job(querierOrchestrator.execute, 'interval', seconds=queryInterval)
 
     return scheduler
 
 
 app = create_app()
 querierOrchestrator = QuerierOrchestrator(settings.systems_health.queriers)
-scheduler = create_querier_scheduler(querierOrchestrator)
+scheduler = create_querier_scheduler(querierOrchestrator,settings.systems_health.query_interval)
 
 if __name__ == "__main__":
     scheduler.start()

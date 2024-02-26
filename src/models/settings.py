@@ -4,7 +4,7 @@ from typing import List, Type, Tuple, Any, Dict, Optional
 
 import yaml
 from prometheus_api_client import PrometheusConnect
-from pydantic import BaseModel, SecretStr
+from pydantic import BaseModel, SecretStr, PositiveInt
 from pydantic.fields import FieldInfo, Field
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource
 
@@ -115,6 +115,7 @@ class Queriers(BaseModel):
 class SystemsHealth(BaseModel):
     enabled: bool = True
     queriers: Queriers = Queriers()
+    query_interval: PositiveInt = Field(default=60,description="Interval in which the alert sources should be queried (in Seconds)")
 
 class Settings(BaseSettings):
     api_base: str = "/api"
