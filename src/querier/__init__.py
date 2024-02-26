@@ -3,23 +3,24 @@ from dataclasses import dataclass
 import datetime
 from json import JSONEncoder
 import json
+from typing import Any
 
+from models.settings import Queriers
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.alertsmanagement import AlertsManagementClient
 from azure.mgmt.alertsmanagement.models import MonitorCondition
 from prometheus_api_client import PrometheusConnect
-
-
+from pydantic import SecretStr
 @dataclass
 class Alert:
     name: str
     description: str
     url: str
-    startTimestamp: str
+    startTimestamp: datetime.datetime
 
 
 class AlertJsonEncoder(JSONEncoder):
-    def default(self, obj):
+    def default(self, obj: Any) -> Any:
         if dataclasses.is_dataclass(obj):
             return dataclasses.asdict(obj)
         if isinstance(obj, (datetime.date, datetime.datetime)):
@@ -27,8 +28,8 @@ class AlertJsonEncoder(JSONEncoder):
 
 
 class QuerierOrchestrator:
-    def __init__(self, querierConfig):
-        queriers = []
+    def __init__(self, querierConfig: Queriers) -> None:
+        queriers: list[Querier] = []
         # Create Azure queriers
         for azureConfig in querierConfig.azure:
             queriers.append(AzureQuerier(
@@ -47,7 +48,7 @@ class QuerierOrchestrator:
             ))
         self.queriers = queriers
 
-    def execute(self):  # TODO: create Alert model
+    def execute(self) -> None:  # TODO: create Alert model
         alerts = []
         for querier in self.queriers:
             for alert in querier.query():
@@ -58,12 +59,12 @@ class QuerierOrchestrator:
 
 
 class Querier:
-    def query(self):
+    def query(self) -> list[Alert]:
         raise NotImplementedError("Please implement this method in a child-class")
 
 
 class AzureQuerier(Querier):
-    def __init__(self, name, subscriptionID):
+    def __init__(self, name: str, subscriptionID: str) -> None:
         self.name = name
         self.resourceID = subscriptionID
 
@@ -91,7 +92,7 @@ class AzureQuerier(Querier):
 
 
 class PrometheusQuerier(Querier):
-    def __init__(self, name, url, user, password, ssl_verify, query):
+    def __init__(self, name:str, url:str, user:str, password:SecretStr, ssl_verify:bool, query:str) -> None:
         self.name = name
         self.queryString = query
         auth = (user, password)

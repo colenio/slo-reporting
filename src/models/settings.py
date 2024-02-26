@@ -54,7 +54,7 @@ class Prometheus(BaseModel):
     _client: Optional[PrometheusConnect] = None
 
     @property
-    def client(self):
+    def client(self) -> PrometheusConnect:
         if self._client is None:
             auth = (self.user, self.password.get_secret_value())
             self._client = PrometheusConnect(url=self.url, auth=auth, disable_ssl=self.ssl_verify)
@@ -115,7 +115,6 @@ class Queriers(BaseModel):
 class SystemsHealth(BaseModel):
     enabled: bool = True
     queriers: Queriers = Queriers()
-
 
 class Settings(BaseSettings):
     api_base: str = "/api"
