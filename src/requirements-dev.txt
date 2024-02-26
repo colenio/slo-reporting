@@ -1,12 +1,15 @@
 atomicwrites==1.4.1
-attrs==23.1.0
+attrs==23.2.0
+charset-normalizer==3.3.2
 colorama==0.4.6
-httpx==0.26.0
+fonttools==4.49.0
+httpx==0.27.0
+matplotlib==3.8.3
 mypy==1.8.0
 pur==7.3.1
-pandas-stubs==2.1.4.231227
-pylint==3.0.3 # bug in 3.0.0 cannot import IReporter
-pytest==7.4.3
+pandas-stubs==2.2.0.240218
+pylint==3.1.0
+pytest==8.0.2
 pytest_mypy==0.10.3
 pytest-cov==4.1.0
 pytest-mock==3.12.0
