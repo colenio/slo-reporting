@@ -8,7 +8,7 @@ def test_settings() -> None:
     assert settings.api_base == "/api"
     assert settings.project == "slo-reporting"
     assert settings.stage == "dev"
-    assert settings.version == "0.1.0"
+    assert settings.version == "0.2.0"
     assert settings.git_commit == "-local-"
 
     metrics = settings.metrics

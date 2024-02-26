@@ -25,3 +25,12 @@ status:
       - name: prometheus
         url: http://localhost:9090
         query: "ALERTS{}"
+    alertmanager:
+      - name: alertmanager
+        url: http://localhost:9093
+        filters:
+          - "foo=bar"
+        active: True
+        silenced: False
+        inhibited: False
+        unprocessed: False

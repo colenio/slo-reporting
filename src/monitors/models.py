@@ -7,11 +7,11 @@ from models.settings import MonitorConfig
 
 
 class Alert(BaseModel):
-    type: Literal["Prometheus", "Azure"]
+    type: Literal["Prometheus", "Azure", "Alertmanager"]
     name: str
     timestamp: datetime
-    description: Optional[str]
-    url: Optional[str]
+    description: Optional[str] = None
+    url: Optional[str] = None
 
 
 class Monitor:

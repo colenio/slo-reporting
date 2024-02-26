@@ -96,6 +96,14 @@ class Metrics(BaseModel):
 class MonitorConfig(BaseModel):
     name: str = Field(description="Name of the Monitor")
 
+class AlertmanagerMonitorConfig(MonitorConfig):
+    url: str = Field(default="http://localhost:9093")
+    filters: List[str] = []
+    active: bool = Field(default=True,description="Show active alerts?")
+    silenced: bool = Field(default=False,description="Show silenced alerts?")
+    inhibited: bool = Field(default=False,description="Show inhibited alerts?")
+    unprocessed: bool = Field(default=False,description="Show unprocessed alerts?")
+
 
 class AzureMonitorConfig(MonitorConfig):
     subscription_id: str = Field(description="SubscriptionID of the Azure-Resource to query", alias="subscriptionID")
@@ -112,6 +120,7 @@ class PrometheusMonitorConfig(MonitorConfig):
 class Monitors(BaseModel):
     azure: List[AzureMonitorConfig] = []
     prometheus: List[PrometheusMonitorConfig] = []
+    alertmanager: List[AlertmanagerMonitorConfig] = []
 
 
 class Status(BaseModel):

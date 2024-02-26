@@ -1,3 +1,4 @@
+from datetime import timedelta
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -5,7 +6,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 from api import add_api
 from models.settings import settings
-from monitors import QuerierOrchestrator
+from monitors.orchestrator import AggregateMonitor
 from observability import add_observability
 from ui import add_ui
 
@@ -26,17 +27,18 @@ def create_app() -> FastAPI:
 
 
 # TODO: check if there's a supertype which might be returned
-def create_querier_scheduler(querierOrchestrator: QuerierOrchestrator,queryInterval: int) -> BackgroundScheduler:
+def create_querier_scheduler(querierOrchestrator: AggregateMonitor,interval: timedelta) -> BackgroundScheduler:
     scheduler = BackgroundScheduler()
 
-    scheduler.add_job(querierOrchestrator.execute, 'interval', seconds=queryInterval)
+    # NOTE: timedelta and APScheduler support different time-units...
+    scheduler.add_job(querierOrchestrator.execute, 'interval',days=interval.days, seconds=interval.seconds)
 
     return scheduler
 
 
 app = create_app()
-querierOrchestrator = QuerierOrchestrator(settings.status.monitors)
-scheduler = create_querier_scheduler(querierOrchestrator, settings.status.query_interval)
+querierOrchestrator = AggregateMonitor(settings.status.monitors)
+scheduler = create_querier_scheduler(querierOrchestrator, settings.status.interval)
 
 if __name__ == "__main__":
     scheduler.start()
