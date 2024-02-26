@@ -1,10 +1,10 @@
-from datetime import timedelta, datetime, tzinfo, timezone
+from datetime import timedelta, datetime, timezone
 from pathlib import Path
 from typing import List, Type, Tuple, Any, Dict, Optional
 
 import yaml
 from prometheus_api_client import PrometheusConnect
-from pydantic import BaseModel, SecretStr, PositiveInt
+from pydantic import BaseModel, SecretStr
 from pydantic.fields import FieldInfo, Field
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource
 
@@ -93,13 +93,15 @@ class Metrics(BaseModel):
         return dt
 
 
-class AzureQuerier(BaseModel):
-    name: str = Field(default="azure-querier", description="Name of the Querier")
-    subscriptionID: str = Field(description="SubscriptionID of the Azure-Resource to query")
+class MonitorConfig(BaseModel):
+    name: str = Field(description="Name of the Monitor")
 
 
-class PrometheusQuerier(BaseModel):
-    name: str = Field(default="prometheus-querier", description="Name of the Querier")
+class AzureMonitorConfig(MonitorConfig):
+    subscription_id: str = Field(description="SubscriptionID of the Azure-Resource to query", alias="subscriptionID")
+
+
+class PrometheusMonitorConfig(MonitorConfig):
     url: str = Field(default="http://localhost:9090", description="URL of the Prometheus server")
     user: str = Field(default="prometheus-user", description="Username for the Prometheus server")
     password: SecretStr = Field(default=SecretStr("password"), description="Password for the Prometheus server")
@@ -107,33 +109,36 @@ class PrometheusQuerier(BaseModel):
     query: str = Field(default="ALERTS{}", description="Query which should be executed")
 
 
-class Queriers(BaseModel):
-    azure: List[AzureQuerier] = Field(default_factory=list, description="List of Azure Queriers")
-    prometheus: List[PrometheusQuerier] = Field(default_factory=list, description="List of Prometheus Queriers")
+class Monitors(BaseModel):
+    azure: List[AzureMonitorConfig] = []
+    prometheus: List[PrometheusMonitorConfig] = []
 
 
-class SystemsHealth(BaseModel):
+class Status(BaseModel):
     enabled: bool = True
-    queriers: Queriers = Queriers()
-    query_interval: PositiveInt = Field(default=60,description="Interval in which the alert sources should be queried (in Seconds)")
+    monitors: Monitors = Monitors()
+    interval: timedelta = Field(default=timedelta(minutes=1), description="Interval in which the monitors should be scraped")
+
 
 class Settings(BaseSettings):
     api_base: str = "/api"
     project: str = "slo-reporting"
     stage: str = "dev"
-    version: str = "0.1.0"
+    version: str = "0.2.0"
     git_commit: str = "-local-"
     metrics: Metrics = Metrics()
-    systems_health: SystemsHealth = SystemsHealth()
+    status: Status = Status()
 
     # https://docs.pydantic.dev/latest/concepts/pydantic_settings/#adding-sources
     @classmethod
-    def settings_customise_sources(cls, settings_cls: Type[BaseSettings], init_settings: PydanticBaseSettingsSource,
-                                   env_settings: PydanticBaseSettingsSource,
-                                   dotenv_settings: PydanticBaseSettingsSource,
-                                   file_secret_settings: PydanticBaseSettingsSource, ) -> Tuple[
-        PydanticBaseSettingsSource, ...]:
-        return (init_settings, YamlConfigSettingsSource(settings_cls), env_settings, file_secret_settings,)
+    # @formatter:off
+    def settings_customise_sources(cls, settings_cls: Type[BaseSettings],
+       init_settings: PydanticBaseSettingsSource,
+       env_settings: PydanticBaseSettingsSource,
+       dotenv_settings: PydanticBaseSettingsSource,
+       file_secret_settings: PydanticBaseSettingsSource
+   ) -> Tuple[PydanticBaseSettingsSource, ...]:
+        return init_settings, YamlConfigSettingsSource(settings_cls), env_settings, file_secret_settings,
 
 
 settings = Settings()

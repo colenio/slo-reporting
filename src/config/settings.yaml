@@ -13,14 +13,15 @@ metrics:
 #    - name: "status-uptime"
 #      goal: 99.9
 #      query: 100 * sum(min_over_time(up{job="prometheus"}[15m]))
-systems_health:
+
+status:
   enabled: True
-  query_interval: 60
-  queriers:
+  interval: PT1M
+  monitors:
     azure:
       - name: azure
         subscriptionID: XXXXXX-XXXX-XXXXXX-XXXX-XXXXXX
     prometheus:
-      - name: prom
+      - name: prometheus
         url: http://localhost:9090
         query: "ALERTS{}"

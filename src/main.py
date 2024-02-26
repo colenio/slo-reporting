@@ -5,7 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 from api import add_api
 from models.settings import settings
-from querier import QuerierOrchestrator 
+from monitors import QuerierOrchestrator
 from observability import add_observability
 from ui import add_ui
 
@@ -35,8 +35,8 @@ def create_querier_scheduler(querierOrchestrator: QuerierOrchestrator,queryInter
 
 
 app = create_app()
-querierOrchestrator = QuerierOrchestrator(settings.systems_health.queriers)
-scheduler = create_querier_scheduler(querierOrchestrator,settings.systems_health.query_interval)
+querierOrchestrator = QuerierOrchestrator(settings.status.monitors)
+scheduler = create_querier_scheduler(querierOrchestrator, settings.status.query_interval)
 
 if __name__ == "__main__":
     scheduler.start()
