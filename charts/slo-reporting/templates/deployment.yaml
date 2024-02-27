@@ -51,8 +51,10 @@ spec:
             - name: config
               mountPath: /app/config
               readOnly: true
+            {{- if .Values.config.metrics.enabled }}
             - name: bucket
               mountPath: /app/data
+            {{- end }}
       volumes:
         - name: config
           configMap:
