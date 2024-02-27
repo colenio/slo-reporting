@@ -60,10 +60,12 @@ spec:
             items:
               - key: settings.yaml
                 path: settings.yaml
+        {{- if .Values.config.metrics.enabled }}
         - name: bucket
           azureFile:
             secretName: {{ .Values.config.metrics.bucket.secretName }}
             shareName: {{ .Values.config.metrics.bucket.name }}
+        {{- end }}
 
       {{- with .Values.nodeSelector }}
       nodeSelector:
