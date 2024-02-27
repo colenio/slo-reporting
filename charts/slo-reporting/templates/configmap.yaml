@@ -27,18 +27,20 @@ data:
     status:
       enabled: {{ .enabled }}
       interval: {{ .interval }}
+      {{- with .monitors}}
       monitors:
+        {{- with .azure }}
         azure:
-          {{- with .monitors.azure }}
           {{- toYaml . | trim | nindent 8 }}
-          {{- end }}
+        {{- end }}
+        {{- with .prometheus }}
         prometheus:
-          {{- with .monitors.prometheus }}
           {{- toYaml . | trim | nindent 8 }}
-          {{- end }}
+        {{- end }}
+        {{- with .alertmanager }}
         alertmanager:
-          {{- with .monitors.alertmanager }}
           {{- toYaml . | trim | nindent 8 }}
-          {{- end }}
+        {{- end }}
+      {{- end }}
   {{- end }}
 {{- end }}
