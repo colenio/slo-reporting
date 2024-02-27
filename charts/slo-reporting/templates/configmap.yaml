@@ -24,20 +24,21 @@ data:
         {{- end }}
   {{- end }}
   {{- with .status }}
-    enabled: {{ .enabled }}
-    interval: {{ .interval }}
-    monitors:
-      azure:
-        {{- with .monitors.azure }}
-        {{- toYaml . | trim | nindent 6 }}
-        {{- end }}
-      prometheus:
-        {{- with .monitors.prometheus }}
-        {{- toYaml . | trim | nindent 6 }}
-        {{- end }}
-      alertmanager:
-        {{- with .monitors.alertmanager }}
-        {{- toYaml . | trim | nindent 6 }}
-        {{- end }}
+    status:
+      enabled: {{ .enabled }}
+      interval: {{ .interval }}
+      monitors:
+        azure:
+          {{- with .monitors.azure }}
+          {{- toYaml . | trim | nindent 6 }}
+          {{- end }}
+        prometheus:
+          {{- with .monitors.prometheus }}
+          {{- toYaml . | trim | nindent 6 }}
+          {{- end }}
+        alertmanager:
+          {{- with .monitors.alertmanager }}
+          {{- toYaml . | trim | nindent 6 }}
+          {{- end }}
   {{- end }}
 {{- end }}
