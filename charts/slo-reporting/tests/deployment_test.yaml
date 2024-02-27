@@ -63,7 +63,7 @@ tests:
             - name: bucket
               azureFile:
                 secretName: slo-reporting
-                shareName: backup
+                shareName: slo-reports
       - equal: # resources
           path: spec.template.spec.containers[0].resources
           value:
