@@ -51,7 +51,7 @@ config:
       #    query: 'ALERTS{alertstate="firing", severity="critical", relevance="health-status"}'
       alertmanager: []
       #  - name: alertmanager
-      #    url: http://localhost:9093
+      #    url: http://localhost:9093/api/v2/alerts
       #    filters:
       #      - "receiver=email"
       #      - "severity=critical"
