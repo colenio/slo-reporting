@@ -1,5 +1,5 @@
 metrics:
-  enabled: True
+  enabled: False # True
   prometheus:
     url: http://localhost:9090
   archive: ./data/slo-reporting.csv
@@ -18,18 +18,21 @@ status:
   enabled: True
   interval: PT1M
   monitors:
-    azure:
-      - name: azure
-        subscriptionID: XXXXXX-XXXX-XXXXXX-XXXX-XXXXXX
+    azure: []
+    #      - name: azure
+    #        subscription_id: XXXXXX-XXXX-XXXXXX-XXXX-XXXXXX
     prometheus:
-      - name: prometheus
-        url: http://localhost:9090
-        query: "ALERTS{}"
+      []
+      # - name: prometheus
+      #   url: http://localhost:9090
+      #   query: 'ALERTS{alertstate="firing", severity="critical", relevance="health-status"}'
     alertmanager:
       - name: alertmanager
         url: http://localhost:9093
-        filters:
-          - "foo=bar"
+        filters: []
+        #          - "receiver=email"
+        #          - "severity=critical"
+        #          - "relevance=health-status"
         active: True
         silenced: False
         inhibited: False

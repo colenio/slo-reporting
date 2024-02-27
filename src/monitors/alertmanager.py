@@ -1,41 +1,38 @@
-import datetime
-from typing import List
+from datetime import datetime
+from typing import List, Dict, Any
 
-import requests
+from requests import Request, PreparedRequest, Session
 
+from models.settings import AlertManagerConfig
 from monitors.models import Alert, Monitor
-from models.settings import AlertmanagerMonitorConfig
 
 
-class AlertmanagerMonitor(Monitor):
-    requestUrl: str 
+class AlertManagerMonitor(Monitor):
+    request: PreparedRequest
 
-    def __init__(self, name: str,url: str,filters: List[str],active: bool, silenced: bool, inhibited: bool, unprocessed: bool):
-        self.name = name 
-        filter = ""
-
-        if len(filters) > 0:
-            filter: str = "filter=" + "&".join(filters)
-        self.requestUrl = f"{url}/api/v2/alerts?{filter}&active={str(active).lower()}&silenced={str(silenced).lower()}&inhibited={str(inhibited).lower()}&unprocessed={str(unprocessed).lower()}"
+    def __init__(self, request: PreparedRequest, name: str):
+        super().__init__(name)
+        self.request = request
 
     @staticmethod
-    def of(config: AlertmanagerMonitorConfig) -> 'AlertmanagerMonitor':
-        return AlertmanagerMonitor(config.name,config.url,config.filters,config.active,config.silenced,config.inhibited,config.unprocessed)
+    def of(config: AlertManagerConfig) -> 'AlertManagerMonitor':
+        params = config.to_params()
+        request = Request(method='GET', url=config.url, params=params).prepare()
+        return AlertManagerMonitor(request, config.name)
 
     def scrape(self) -> List[Alert]:
-        alerts: List[Alert] = []
-
-        results = requests.get(self.requestUrl).json()
-        for result in results:
-            alert = Alert(
-                type="Alertmanager",
-                name = str(result.get('labels',{}).get('alertname', 'Unknown')),
-                description = str(result.get('annotations', {}).get('description', '')),
-                # TODO: get timestamp and parse it to datetime 
-                timestamp=datetime.datetime.utcnow(),
-                url = str(result.get('annotations',{}).get('dashboard','')),
-            )
-            alerts.append(alert)
-           
+        results = Session().send(self.request).json()
+        alerts = [self.alert_of(result) for result in results]
         return alerts
-                   
+
+    def alert_of(self, result: Dict[str, Any]) -> Alert:
+        timestamp = datetime.fromisoformat(result.get('startsAt', datetime.utcnow().isoformat()))
+
+        labels: Dict[str, str] = result.get('labels', {})
+        name = labels.get('alertname', 'Unknown')
+
+        annotations: Dict[str, str] = result.get('annotations', {})
+        description = annotations.get('description', '')
+        url = annotations.get('dashboard', annotations.get('runbook_url', ''))
+
+        return Alert(type=self.type, name=name, timestamp=timestamp, description=description, url=url)

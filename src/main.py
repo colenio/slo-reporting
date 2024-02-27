@@ -1,45 +1,52 @@
-from datetime import timedelta
-import uvicorn
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from apscheduler.schedulers.background import BackgroundScheduler
+from typing import List
 
-from api import add_api
+import uvicorn
+from fastapi import FastAPI, APIRouter
+from fastapi_restful.tasks import repeat_every
+
+from api import config, slo, status
 from models.settings import settings
-from monitors.orchestrator import AggregateMonitor
+from monitors.aggregate import AggregateMonitor
+from monitors.alertmanager import AlertManagerMonitor
+from monitors.azure import AzureMonitor
+from monitors.models import Monitor
+from monitors.prometheus import PrometheusMonitor
 from observability import add_observability
 from ui import add_ui
+
+
+def add_api(the_app: FastAPI) -> None:
+    api_router = APIRouter()
+    api_router.include_router(config.router, prefix="/config", tags=["config"])
+    if settings.metrics.enabled:
+        api_router.include_router(slo.router, prefix="/slo", tags=["slo"])
+    if settings.status.enabled:
+        api_router.include_router(status.router, prefix="/status", tags=["status"])
+    the_app.include_router(api_router, prefix=settings.api_base)
 
 
 def create_app() -> FastAPI:
     the_app = FastAPI(title=settings.project, openapi_url=f"{settings.api_base}/openapi.json")
     add_observability(the_app)
     add_api(the_app)
-    the_app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
     add_ui(the_app)
     return the_app
 
 
-# TODO: check if there's a supertype which might be returned
-def create_querier_scheduler(querierOrchestrator: AggregateMonitor,interval: timedelta) -> BackgroundScheduler:
-    scheduler = BackgroundScheduler()
-
-    # NOTE: timedelta and APScheduler support different time-units...
-    scheduler.add_job(querierOrchestrator.execute, 'interval',days=interval.days, seconds=interval.seconds)
-
-    return scheduler
-
-
 app = create_app()
-querierOrchestrator = AggregateMonitor(settings.status.monitors)
-scheduler = create_querier_scheduler(querierOrchestrator, settings.status.interval)
 
 if __name__ == "__main__":
-    scheduler.start()
+    if settings.status.enabled:
+        mon = settings.status.monitors
+        monitors: List[Monitor] = [AzureMonitor.of(m) for m in mon.azure]
+        monitors += [PrometheusMonitor.of(m) for m in mon.prometheus]
+        monitors += [AlertManagerMonitor.of(m) for m in mon.alertmanager]
+        monitor = AggregateMonitor(monitors)
+
+
+        @app.on_event("startup")
+        @repeat_every(seconds=settings.status.interval.total_seconds())
+        def scrape_status() -> None:
+            monitor.scrape()
+
     uvicorn.run(app, host='0.0.0.0', port=8000)

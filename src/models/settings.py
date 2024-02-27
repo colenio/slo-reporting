@@ -94,39 +94,55 @@ class Metrics(BaseModel):
 
 
 class MonitorConfig(BaseModel):
-    name: str = Field(description="Name of the Monitor")
+    pass
 
-class AlertmanagerMonitorConfig(MonitorConfig):
-    url: str = Field(default="http://localhost:9093")
+
+class AlertManagerConfig(MonitorConfig):
+    name: str = Field(default="alertmanager")
+    # https://github.com/prometheus/alertmanager/blob/main/api/v2/openapi.yaml
+    url: str = Field(default="http://localhost:9093/api/v2/alerts", description="URL of the AlertManager server")
     filters: List[str] = []
-    active: bool = Field(default=True,description="Show active alerts?")
-    silenced: bool = Field(default=False,description="Show silenced alerts?")
-    inhibited: bool = Field(default=False,description="Show inhibited alerts?")
-    unprocessed: bool = Field(default=False,description="Show unprocessed alerts?")
+    active: bool = Field(default=True, description="Show active alerts?")
+    silenced: bool = Field(default=False, description="Show silenced alerts?")
+    inhibited: bool = Field(default=False, description="Show inhibited alerts?")
+    unprocessed: bool = Field(default=False, description="Show unprocessed alerts?")
+
+    def to_params(self) -> Dict[str, Any]:
+        # https://github.com/prometheus/alertmanager/blob/efa801faf7e1c176b797e30379b840b6521973ed/api/v2/openapi.yaml#L142
+        # @formatter:off
+        return {
+            'active': str(self.active).lower(),
+            'filter': self.filters,
+            'inhibited': str(self.inhibited).lower(),
+            'silenced': str(self.silenced).lower(),
+            'unprocessed': str(self.unprocessed).lower(),
+        }
 
 
 class AzureMonitorConfig(MonitorConfig):
-    subscription_id: str = Field(description="SubscriptionID of the Azure-Resource to query", alias="subscriptionID")
+    name: str = Field(default="azure")
+    subscription_id: str
 
 
 class PrometheusMonitorConfig(MonitorConfig):
-    url: str = Field(default="http://localhost:9090", description="URL of the Prometheus server")
-    user: str = Field(default="prometheus-user", description="Username for the Prometheus server")
-    password: SecretStr = Field(default=SecretStr("password"), description="Password for the Prometheus server")
-    ssl_verify: bool = Field(default=False, description="Verify SSL certificate")
-    query: str = Field(default="ALERTS{}", description="Query which should be executed")
+    name: str = Field(default='prometheus')
+    url: str = Field(default='http://localhost:9090')
+    user: str = Field(default='')
+    password: SecretStr = Field(default=SecretStr(''))
+    ssl_verify: bool = Field(default=False)
+    query: str = Field(default='ALERTS{alertstate="firing", severity="critical", relevance="health-status"}')
 
 
 class Monitors(BaseModel):
     azure: List[AzureMonitorConfig] = []
     prometheus: List[PrometheusMonitorConfig] = []
-    alertmanager: List[AlertmanagerMonitorConfig] = []
+    alertmanager: List[AlertManagerConfig] = []
 
 
 class Status(BaseModel):
     enabled: bool = True
     monitors: Monitors = Monitors()
-    interval: timedelta = Field(default=timedelta(minutes=1), description="Interval in which the monitors should be scraped")
+    interval: timedelta = Field(default=timedelta(minutes=1), description="Scrape interval")
 
 
 class Settings(BaseSettings):

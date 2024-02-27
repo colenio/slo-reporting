@@ -1,9 +1,11 @@
 import logging
+from datetime import datetime
 from typing import List
 
 from azure.core.credentials import TokenCredential
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.alertsmanagement import AlertsManagementClient
+from azure.mgmt.alertsmanagement.models import Alert as AzAlert, AlertProperties, Essentials
 from azure.mgmt.alertsmanagement.models import MonitorCondition
 
 from models.settings import AzureMonitorConfig
@@ -13,32 +15,26 @@ from monitors.models import Alert, Monitor
 class AzureMonitor(Monitor):
     client: AlertsManagementClient
 
-    def __init__(self, name: str, client: AlertsManagementClient) -> None:
-        self.name = name
+    def __init__(self, client: AlertsManagementClient, name: str = '') -> None:
+        super().__init__(name)
         self.client = client
 
     @staticmethod
     def of(config: AzureMonitorConfig) -> 'AzureMonitor':
         credential: TokenCredential = DefaultAzureCredential()  # type: ignore
         client = AlertsManagementClient(credential=credential, subscription_id=config.subscription_id)
-        return AzureMonitor(config.name, client)
+        return AzureMonitor(client, config.name)
 
     def scrape(self) -> List[Alert]:
-        alerts: List[Alert] = []
-        response = self.client.alerts.get_all(
-            monitor_condition=MonitorCondition.FIRED,
-            severity='Sev0',  #  TODO: This should be configurable
-        )
-        for item in response:
-            alert = Alert(
-                type="Azure",
-                name=item.name,
-                description=item.properties.essentials.additional_properties['description'],
-                url=item.properties.essentials.alert_rule,
-                timestamp=item.properties.essentials.start_date_time)
-            alerts.append(alert)
-
-        logging.debug("Azure-Querier: %s successfully queried", self.name)
+        response = self.client.alerts.get_all(monitor_condition=MonitorCondition.FIRED, severity='Sev0')
+        alerts = [self.alert_of(item) for item in response]
         return alerts
 
-
+    def alert_of(self, az_alert: AzAlert) -> Alert:
+        # @formatter:off
+        props = az_alert.properties or AlertProperties()
+        essentials = props.essentials or Essentials()
+        description = essentials.additional_properties.get('description', '')
+        url = essentials.alert_rule or ''
+        timestamp = essentials.start_date_time or datetime.utcnow()
+        return Alert(type=self.type, name=az_alert.name, description=description, url=url, timestamp=timestamp)
