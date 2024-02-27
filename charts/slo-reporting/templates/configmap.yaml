@@ -10,10 +10,34 @@ metadata:
 data:
   settings.yaml: |-
 {{- with .Values.config }}
-    prometheus: {{ .prometheus.url }}
-    archive: {{ .bucket.path }}/{{ .bucket.output }}
-    slo:
-      {{- with .slo }}
-      {{- toYaml . | trim | nindent 6 }}
-      {{- end }}
+  {{- with .metrics }}
+    metrics:
+      enabled: {{ .enabled }}
+      prometheus: 
+        url: {{ .prometheus.url }}
+      archive: {{ .bucket.path }}/{{ .bucket.output }}
+      window: {{ .window }}
+      step: {{ .step }}
+      slo:
+        {{- with .slo }}
+        {{- toYaml . | trim | nindent 6 }}
+        {{- end }}
+  {{- end }}
+  {{- with .status }}
+    enabled: {{ .enabled }}
+    interval: {{ .interval }}
+    monitors:
+      azure:
+        {{- with .monitors.azure }}
+        {{- toYaml . | trim | nindent 6 }}
+        {{- end }}
+      prometheus:
+        {{- with .monitors.prometheus }}
+        {{- toYaml . | trim | nindent 6 }}
+        {{- end }}
+      alertmanager:
+        {{- with .monitors.alertmanager }}
+        {{- toYaml . | trim | nindent 6 }}
+        {{- end }}
+  {{- end }}
 {{- end }}

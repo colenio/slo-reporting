@@ -62,8 +62,8 @@ spec:
                 path: settings.yaml
         - name: bucket
           azureFile:
-            secretName: {{ .Values.config.bucket.secretName }}
-            shareName: {{ .Values.config.bucket.name }}
+            secretName: {{ .Values.config.metrics.bucket.secretName }}
+            shareName: {{ .Values.config.metrics.bucket.name }}
 
       {{- with .Values.nodeSelector }}
       nodeSelector:

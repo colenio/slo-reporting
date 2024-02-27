@@ -7,27 +7,60 @@ config:
     enabled: true
     # -- The cronjob schedule for running the job (default: nightly at 2AM)
     schedule: "0 23 * * *"
-  prometheus:
-    # -- Prometheus URL to query
-    url: http://prometheus-community-kube-prometheus.observability:9090
-  # -- List of SLOs to report on
-  slo:
-    - name: "prometheus-uptime" # required
-      query: 100 * sum(min_over_time(up{job="prometheus"}[15m])) by (job) # promql, required
-      goal: 99.9 # 99.9% uptime, default
-      rolling_period: P1W # 1 week, default
-      step: P1D # 1 day, default
-  bucket:
-    # -- Path to the archive file
-    output: slo-reporting.csv
-    # -- Mount path in pod
-    path: /app/data
-    # -- Type of bucket to use (azure, gcs, s3)
-    type: azure
-    # -- Azure File Share to store slo reports
-    name: backup
-    # -- Name of pre-existing Secret for Azure Storage to use
-    secretName: slo-reporting
+  #---
+  metrics:
+    # -- Should SLO reports be generated from configured SLOs
+    enabled: true
+    prometheus:
+      # -- Prometheus URL to query
+      url: http://prometheus-community-kube-prometheus.observability:9090
+    # -- Evaluation window for SLOs
+    window: P1W
+    # -- In what granularity (step-size) should SLOs be reported
+    step: P1D
+    # -- List of SLOs to report on
+    slo:
+      - name: "prometheus-uptime" # required
+        query: 100 * sum(min_over_time(up{job="prometheus"}[15m])) by (job) # promql, required
+        goal: 99.9 # 99.9% uptime, default
+        rolling_period: P1W # 1 week, default
+        step: P1D # 1 day, default
+    bucket:
+      # -- Path to the archive file
+      output: slo-reporting.csv
+      # -- Mount path in pod
+      path: /app/data
+      # -- Type of bucket to use (azure, gcs, s3)
+      type: azure
+      # -- Azure File Share to store slo reports
+      name: slo-reports
+      # -- Name of pre-existing Secret for Azure Storage to use
+      secretName: slo-reporting
+  status:
+    # -- Should a status API be created which aggregates alerts from multiple sources?
+    enabled: true
+    # -- Scrape interval of alert sources
+    interval: PT1M
+    monitors:
+      azure: []
+      #  - name: azure
+      #    subscription_id: XXXXXX-XXXX-XXXXXX-XXXX-XXXXXX
+      prometheus: []
+      #  - name: prometheus
+      #    url: http://localhost:9090
+      #    query: 'ALERTS{alertstate="firing", severity="critical", relevance="health-status"}'
+      alertmanager: []
+      #  - name: alertmanager
+      #    url: http://localhost:9093
+      #    filters:
+      #      - "receiver=email"
+      #      - "severity=critical"
+      #      - "relevance=health-status"
+      #    active: True
+      #    silenced: False
+      #    inhibited: False
+      #    unprocessed: False
+
 #--------
 image:
   repository: ghcr.io/colenio/slo-reporting
