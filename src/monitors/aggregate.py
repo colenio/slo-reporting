@@ -7,6 +7,7 @@ from monitors.models import Monitor, Alert
 
 class AggregateMonitor(Monitor):
     def __init__(self, monitors: List[Monitor]) -> None:
+        super().__init__('aggregate')
         self.monitors = monitors
         self.adapter = TypeAdapter(List[Alert])
 

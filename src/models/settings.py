@@ -1,11 +1,13 @@
+import re
 from datetime import timedelta, datetime, timezone
 from pathlib import Path
 from typing import List, Type, Tuple, Any, Dict, Optional
 
 import yaml
 from prometheus_api_client import PrometheusConnect
-from pydantic import BaseModel, SecretStr
+from pydantic import BaseModel, SecretStr, field_validator
 from pydantic.fields import FieldInfo, Field
+from pydantic_core.core_schema import ValidationInfo
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource
 
 PROJECT_ROOT = (Path(__file__).resolve().parent / '..').resolve().absolute()
@@ -101,22 +103,36 @@ class AlertManagerConfig(MonitorConfig):
     name: str = Field(default="alertmanager")
     # https://github.com/prometheus/alertmanager/blob/main/api/v2/openapi.yaml
     url: str = Field(default="http://localhost:9093/api/v2/alerts", description="URL of the AlertManager server")
-    filters: List[str] = []
-    active: bool = Field(default=True, description="Show active alerts?")
-    silenced: bool = Field(default=False, description="Show silenced alerts?")
-    inhibited: bool = Field(default=False, description="Show inhibited alerts?")
-    unprocessed: bool = Field(default=False, description="Show unprocessed alerts?")
+    filters: List[str] = Field(default_factory=list, description="A list of matchers to filter alerts by")
+    active: bool = Field(default=True, description="Show active alerts")
+    silenced: bool = Field(default=False, description="Show silenced alerts")
+    inhibited: bool = Field(default=False, description="Show inhibited alerts")
+    unprocessed: bool = Field(default=False, description="Show unprocessed alerts")
+    receiver: str = Field(default='', description="A regex matching receivers to filter alerts by")
 
     def to_params(self) -> Dict[str, Any]:
         # https://github.com/prometheus/alertmanager/blob/efa801faf7e1c176b797e30379b840b6521973ed/api/v2/openapi.yaml#L142
         # @formatter:off
-        return {
+        dct = {
             'active': str(self.active).lower(),
-            'filter': self.filters,
             'inhibited': str(self.inhibited).lower(),
             'silenced': str(self.silenced).lower(),
             'unprocessed': str(self.unprocessed).lower(),
         }
+        if self.filters:
+            dct['filter'] = self.filters,
+        if self.receiver:
+            dct['receiver'] = self.receiver
+        return dct
+
+    @field_validator('receiver')
+    @classmethod
+    def check_regex(cls, v: str, info: ValidationInfo) -> str:
+        try:
+            re.compile(v)
+            return v
+        except re.error as exc:
+            raise ValueError(f'{info.field_name} must be a valid regex') from exc
 
 
 class AzureMonitorConfig(MonitorConfig):

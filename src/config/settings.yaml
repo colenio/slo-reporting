@@ -1,5 +1,5 @@
 metrics:
-  enabled: False # True
+  enabled: True
   prometheus:
     url: http://localhost:9090
   archive: ./data/slo-reporting.csv
@@ -29,11 +29,12 @@ status:
     alertmanager:
       - name: alertmanager
         url: http://localhost:9093
+        # https://github.com/prometheus/alertmanager/blob/main/api/v2/openapi.yaml
+        active: True
         filters: []
-        #          - "receiver=email"
+        inhibited: False
+        receiver: '.*' # (email|slack|webhook)
         #          - "severity=critical"
         #          - "relevance=health-status"
-        active: True
         silenced: False
-        inhibited: False
         unprocessed: False

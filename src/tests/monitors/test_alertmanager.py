@@ -1,6 +1,8 @@
 from datetime import datetime
 
+import pytest
 import requests_mock
+from pydantic import ValidationError
 
 from models.settings import AlertManagerConfig
 from monitors.alertmanager import AlertManagerMonitor
@@ -30,10 +32,18 @@ def test_alertmanager() -> None:
     assert config.filters == []
     assert 'filter=' not in url
 
+    assert not config.receiver
+    assert 'receiver=' not in url
+
     config.filters = ['severity=critical']
+    config.receiver = '(email|slack|webhook)'
     monitor = AlertManagerMonitor.of(config)
     url = str(monitor.request.url)
     assert 'filter=severity%3Dcritical' in url
+    assert 'receiver=%28email%7Cslack%7Cwebhook%29' in url
+
+    with pytest.raises(ValidationError):
+        config.model_validate({'receiver': '(invalid regex'})
 
     timestamp = datetime.utcnow()
     with requests_mock.Mocker() as m:
