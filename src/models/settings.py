@@ -120,7 +120,7 @@ class AlertManagerConfig(MonitorConfig):
             'unprocessed': str(self.unprocessed).lower(),
         }
         if self.filters:
-            dct['filter'] = self.filters,
+            dct['filter'] = self.filters  # type: ignore
         if self.receiver:
             dct['receiver'] = self.receiver
         return dct

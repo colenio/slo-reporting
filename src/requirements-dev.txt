@@ -1,12 +1,5 @@
-atomicwrites==1.4.1
-attrs==23.2.0
-charset-normalizer==3.3.2
-colorama==0.4.6
-fonttools==4.49.0
 httpx==0.27.0
-matplotlib==3.8.3
 mypy==1.8.0
-pur==7.3.1
 pandas-stubs==2.2.0.240218
 pylint==3.1.0
 pytest==8.0.2
