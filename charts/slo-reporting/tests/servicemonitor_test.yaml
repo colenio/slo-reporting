@@ -15,5 +15,5 @@ tests:
           path: spec.endpoints[0]
           value:
             port: http
-            path: "/actuator/prometheus"
+            path: "/metrics"
             interval: 30s
