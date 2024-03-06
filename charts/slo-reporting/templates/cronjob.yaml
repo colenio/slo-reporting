@@ -2,55 +2,26 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ include "slo-reporting.fullname" . }}
+  name: {{ include "slo-reporting.fullname" . }}-update
   labels:
     {{- include "slo-reporting.labels" . | nindent 4 }}
-  annotations:
-    # cf.: https://sanderknape.com/2019/03/kubernetes-helm-configmaps-changes-deployments/
-    checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
 spec:
   concurrencyPolicy: Forbid
-  schedule: {{ .Values.config.cronjob.schedule }}
+  schedule: "{{ .Values.config.cronjob.schedule }}"
   jobTemplate:
     spec:
-      # https://kubernetes.io/docs/concepts/workloads/controllers/job/
       template:
         metadata:
-          {{- with .Values.podAnnotations }}
-          annotations:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
           labels:
             {{- include "slo-reporting.labels" . | nindent 12 }}
         spec:
-          # This pod should only Run once to completion
-          # 'Never' instead of 'OnFailure' will keep the failed pod so one can inspect logs
           restartPolicy: Never
-          {{- with .Values.imagePullSecrets }}
-          imagePullSecrets:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
           containers:
-            - name: {{ .Chart.Name }}
-              image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-              imagePullPolicy: {{ .Values.image.pullPolicy }}
-              resources:
-                {{- toYaml .Values.resources | nindent 16 }}
-              volumeMounts:
-                - name: config
-                  mountPath: /app/config
-                  readOnly: true
-                - name: bucket
-                  mountPath: /app/data
-          volumes:
-            - name: config
-              configMap:
-                name: {{ include "slo-reporting.fullname" . }}
-                items:
-                  - key: settings.yaml
-                    path: settings.yaml
-            - name: bucket
-              azureFile:
-                secretName: {{ .Values.config.metrics.bucket.secretName }}
-                shareName: {{ .Values.config.metrics.bucket.name }}
+            - name: slo-update
+              image: curlimages/curl
+              command: ['curl']
+              args:
+                - '-X'
+                - 'POST'
+                - 'http://{{ .Release.Name }}:{{.Values.service.port}}/api/slo/_update'
 {{- end }}

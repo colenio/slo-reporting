@@ -5,8 +5,8 @@
 config:
   cronjob:
     enabled: true
-    # -- The cronjob schedule for running the job (default: nightly at 2AM)
-    schedule: "0 23 * * *"
+    # -- The cronjob schedule for running the export-metrics job (default: nightly at 2AM)
+    schedule: "@daily"
   #---
   metrics:
     # -- Should SLO reports be generated from configured SLOs
@@ -21,9 +21,9 @@ config:
     # -- List of SLOs to report on
     slo:
       - name: "prometheus-uptime" # required
-        query: 100 * sum(min_over_time(up{job="prometheus"}[15m])) by (job) # promql, required
+        query: 100 * avg(avg_over_time(up{job=~"prometheus.*"}[5m])) # promql, required
         goal: 99.9 # 99.9% uptime, default
-        rolling_period: P1W # 1 week, default
+        window: P1W # 1 week, default
         step: P1D # 1 day, default
     bucket:
       # -- Path to the archive file
