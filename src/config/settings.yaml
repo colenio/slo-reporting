@@ -7,16 +7,17 @@ metrics:
   window: P1W # P1W, PT1H
   step: P1D # P1D, PT1M
   objectives:
-    - name: "prometheus-uptime"
+    - name: "prometheus-uptime" # Default prometheus example
       goal: 99.9
-      query: 100 * sum(min_over_time(up{job="prometheus"}[15m]))
-#    - name: "status-uptime"
+      query: 100 * avg(avg_over_time(up{job=~"prometheus.*"}[15m]))
+#    - name: "slo" # Pyrra Example
 #      goal: 99.9
-#      query: 100 * sum(min_over_time(up{job="prometheus"}[15m]))
+#      query: 100 * pyrra_objective
 
 status:
   enabled: True
   interval: PT1M
+  code: 418 # I'm a teapot on alerts
   monitors:
     azure: []
     #      - name: azure
@@ -31,10 +32,10 @@ status:
         url: http://localhost:9093
         # https://github.com/prometheus/alertmanager/blob/main/api/v2/openapi.yaml
         active: True
-        filters: []
+        filters:
+          - "severity=critical"
+          - "relevance=health-status"
         inhibited: False
         receiver: '.*' # (email|slack|webhook)
-        #          - "severity=critical"
-        #          - "relevance=health-status"
         silenced: False
         unprocessed: False

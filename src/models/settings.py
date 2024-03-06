@@ -65,8 +65,8 @@ class Prometheus(BaseModel):
 
 class ServiceLevelObjective(BaseModel):
     name: str = Field(default="prometheus-uptime", description="Name of the SLO")
-    query: str = Field(default='100 * sum(min_over_time(up{job="prometheus"}[15m]))', description="PromQL query")
     goal: float = Field(default=99.9, description="Goal of the SLO")
+    query: str = Field(default='100 * avg(avg_over_time(up{job=~"prometheus.*"}[5m]))', description="PromQL query")
 
 
 class Metrics(BaseModel):
@@ -159,6 +159,11 @@ class Status(BaseModel):
     enabled: bool = True
     monitors: Monitors = Monitors()
     interval: timedelta = Field(default=timedelta(minutes=1), description="Scrape interval")
+    code: int = 418  # I'm a teapot
+
+    @property
+    def path(self) -> Path:
+        return Path(PROJECT_ROOT / "data" / "alerts.json").resolve().absolute()
 
 
 class Settings(BaseSettings):

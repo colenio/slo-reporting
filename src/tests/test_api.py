@@ -33,14 +33,15 @@ def test_slo_export(client: TestClient) -> None:
 
 
 def test_status(client: TestClient) -> None:
-    # TODO: test with needing file system
-    with open('alerts.json', 'w', encoding='utf-8') as fp:
+    # TODO: test without needing file system
+    path = settings.status.path
+    with open(path, 'w', encoding='utf-8') as fp:
         fp.write("[]")
     response = client.get(f"{settings.api_base}/status")
-    assert response.status_code == 200
+    assert response.is_success
 
-    with open('alerts.json', 'w', encoding='utf-8') as fp:
+    with open(path, 'w', encoding='utf-8') as fp:
         fp.write('[{"name": "testalert", "description": "", "url":"","startTimestamp": ""}]')
 
     response = client.get(f"{settings.api_base}/status")
-    assert response.status_code == 418
+    assert response.status_code == settings.status.code
