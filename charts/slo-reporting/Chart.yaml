@@ -2,8 +2,8 @@ apiVersion: v2
 name: slo-reporting
 description: Excel compatible SLO reporting tool for Prometheus.
 type: application
-version: "0.2.5"
-appVersion: "0.2.13"
+version: "0.3.0"
+appVersion: "0.3.0"
 #----
 keywords:
   - colenio
