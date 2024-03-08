@@ -1,6 +1,6 @@
 # slo-reporting
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.3.0](https://img.shields.io/badge/AppVersion-0.3.0-informational?style=flat-square)
+![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: latest](https://img.shields.io/badge/AppVersion-latest-informational?style=flat-square)
 
 Excel compatible SLO reporting tool for Prometheus.
 
@@ -24,8 +24,12 @@ Kubernetes: `>= 1.26.3`
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| autoscaling | object | `{"enabled":false,"maxReplicas":4,"minReplicas":1,"targetMemoryUtilizationPercentage":80}` | Auto scaling via [HPA](https://docs.microsoft.com/en-us/azure/aks/tutorial-kubernetes-scale#autoscale-pods) |
-| config.cronjob.enabled | bool | `true` |  |
+| autoscaling.enabled | bool | `false` | Enable auto scaling via [HPA](https://docs.microsoft.com/en-us/azure/aks/tutorial-kubernetes-scale#autoscale-pods) |
+| autoscaling.maxReplicas | int | `4` |  |
+| autoscaling.minReplicas | int | `1` |  |
+| autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| autoscaling.targetMemoryUtilizationPercentage | int | `80` |  |
+| config.cronjob.enabled | bool | `true` | Should the export-metrics job be enabled |
 | config.cronjob.schedule | string | `"@daily"` | The cronjob schedule for running the export-metrics job (default: nightly at 2AM) |
 | config.metrics.bucket.name | string | `"slo-reports"` | Azure File Share to store slo reports |
 | config.metrics.bucket.output | string | `"slo-reporting.csv"` | Path to the archive file |
@@ -34,25 +38,37 @@ Kubernetes: `>= 1.26.3`
 | config.metrics.bucket.type | string | `"azure"` | Type of bucket to use (azure, gcs, s3) |
 | config.metrics.enabled | bool | `true` | Should SLO reports be generated from configured SLOs |
 | config.metrics.prometheus.url | string | `"http://prometheus-community-kube-prometheus.observability:9090"` | Prometheus URL to query |
-| config.metrics.slo | list | `[{"goal":99.9,"name":"prometheus-uptime","query":"100 * avg(avg_over_time(up{job=~\"prometheus.*\"}[5m]))","step":"P1D","window":"P1W"},{"goal":99.9,"name":"slo","query":"100 * pyrra_availability","step":"P1D","window":"P1M"}]` | List of SLOs to report on |
+| config.metrics.slo | list | `[{"goal":99.9,"name":"prometheus-uptime","query":"100 * avg(avg_over_time(up{job=~\"prometheus.*\"}[5m]))"},{"goal":99.9,"name":"slo","query":"100 * pyrra_availability"}]` | List of SLOs to report on |
+| config.metrics.slo[0] | object | `{"goal":99.9,"name":"prometheus-uptime","query":"100 * avg(avg_over_time(up{job=~\"prometheus.*\"}[5m]))"}` | Name of the objective, if metric-label of the same name exists, it will be used |
+| config.metrics.slo[0].goal | float | `99.9` | The goal of the SLO in percentage |
+| config.metrics.slo[0].query | string | `"100 * avg(avg_over_time(up{job=~\"prometheus.*\"}[5m]))"` | Prometheus query to evaluate |
 | config.metrics.step | string | `"P1D"` | In what granularity (step-size) should SLOs be reported |
 | config.metrics.window | string | `"P1W"` | Evaluation window for SLOs |
 | config.status.enabled | bool | `true` | Should a status API be created which aggregates alerts from multiple sources? |
 | config.status.interval | string | `"PT1M"` | Scrape interval of alert sources |
-| config.status.monitors.alertmanager | list | `[]` |  |
-| config.status.monitors.azure | list | `[]` |  |
-| config.status.monitors.prometheus | list | `[]` |  |
+| config.status.monitors | object | `{"alertmanager":[{"active":true,"filters":["receiver=email","severity=critical","relevance=health-status"],"inhibited":false,"name":"alertmanager-project1","silenced":false,"unprocessed":false,"url":"http://alertmanager-operated.observability:9093/api/v2/alerts"}],"azure":[{"name":"azure-project-1","subscription_id":"XXXXXX-XXXX-XXXXXX-XXXX-XXXXXX"}],"prometheus":[{"name":"prometheus-project-1","query":"ALERTS{alertstate=\"firing\", severity=\"critical\", relevance=\"health-status\"}","url":"http://prometheus-operated.observability:9090"}]}` | List of alert monitors to aggregate |
+| config.status.monitors.alertmanager | list | `[{"active":true,"filters":["receiver=email","severity=critical","relevance=health-status"],"inhibited":false,"name":"alertmanager-project1","silenced":false,"unprocessed":false,"url":"http://alertmanager-operated.observability:9093/api/v2/alerts"}]` | List of a Alertmanager Monitors |
+| config.status.monitors.alertmanager[0] | object | `{"active":true,"filters":["receiver=email","severity=critical","relevance=health-status"],"inhibited":false,"name":"alertmanager-project1","silenced":false,"unprocessed":false,"url":"http://alertmanager-operated.observability:9093/api/v2/alerts"}` | An example of an Alertmanager monitor |
+| config.status.monitors.alertmanager[0].filters | list | `["receiver=email","severity=critical","relevance=health-status"]` | List of filters to apply, cf. [AlertManager OpenAPI](https://github.com/prometheus/alertmanager/blob/main/api/v2/openapi.yaml) |
+| config.status.monitors.alertmanager[0].url | string | `"http://alertmanager-operated.observability:9093/api/v2/alerts"` | Alertmanager URL to query |
+| config.status.monitors.azure | list | `[{"name":"azure-project-1","subscription_id":"XXXXXX-XXXX-XXXXXX-XXXX-XXXXXX"}]` | List of Azure Monitors |
+| config.status.monitors.azure[0] | object | `{"name":"azure-project-1","subscription_id":"XXXXXX-XXXX-XXXXXX-XXXX-XXXXXX"}` | An example of an Azure monitor |
+| config.status.monitors.azure[0].subscription_id | string | `"XXXXXX-XXXX-XXXXXX-XXXX-XXXXXX"` | Azure Subscription ID |
+| config.status.monitors.prometheus | list | `[{"name":"prometheus-project-1","query":"ALERTS{alertstate=\"firing\", severity=\"critical\", relevance=\"health-status\"}","url":"http://prometheus-operated.observability:9090"}]` | List of Prometheus Monitors |
+| config.status.monitors.prometheus[0] | object | `{"name":"prometheus-project-1","query":"ALERTS{alertstate=\"firing\", severity=\"critical\", relevance=\"health-status\"}","url":"http://prometheus-operated.observability:9090"}` | An example of a Prometheus monitor |
+| config.status.monitors.prometheus[0].query | string | `"ALERTS{alertstate=\"firing\", severity=\"critical\", relevance=\"health-status\"}"` | Prometheus query to evaluate |
+| config.status.monitors.prometheus[0].url | string | `"http://prometheus-operated.observability:9090"` | Prometheus URL to query |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"ghcr.io/colenio/slo-reporting"` |  |
-| image.tag | string | `""` |  |
+| image.repository | string | `"ghcr.io/colenio/slo-reporting"` | The image repository to pull from |
+| image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
-| ingress.enabled | bool | `false` |  |
+| ingress.enabled | bool | `false` | Enable Ingress |
 | ingress.hosts | list | `[]` |  |
 | ingress.tls | list | `[]` |  |
-| metrics.enabled | bool | `true` |  |
+| metrics.enabled | bool | `true` | Enable Prometheus metrics |
 | metrics.serviceMonitor.additionalLabels | list | `[]` |  |
 | metrics.serviceMonitor.enabled | bool | `true` | Enable a [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#servicemonitorspec) |
 | metrics.serviceMonitor.honorLabels | bool | `false` |  |

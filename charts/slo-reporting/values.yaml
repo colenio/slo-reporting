@@ -4,6 +4,7 @@
 ##
 config:
   cronjob:
+    # -- Should the export-metrics job be enabled
     enabled: true
     # -- The cronjob schedule for running the export-metrics job (default: nightly at 2AM)
     schedule: "@daily"
@@ -20,16 +21,15 @@ config:
     step: P1D
     # -- List of SLOs to report on
     slo:
-      - name: "prometheus-uptime" # required
-        query: 100 * avg(avg_over_time(up{job=~"prometheus.*"}[5m])) # promql, required
+      - name: "prometheus-uptime"
+        # -- The goal of the SLO in percentage
         goal: 99.9 # 99.9% uptime, default
-        window: P1W # 1 week, default
-        step: P1D # 1 day, default
-      - name: "slo" # Pyrra Example
+        # -- Prometheus query to evaluate
+        query: 100 * avg(avg_over_time(up{job=~"prometheus.*"}[5m]))
+      # -- [Pyrra](https://github.com/pyrra-dev/pyrra) Example, `slo` is the metric-label
+      - name: "slo"
+        goal: 99.9
         query: 100 * pyrra_availability
-        goal: 99.9 # 99.9% uptime, default
-        window: P1M # 1 month default
-        step: P1D # 1 day, default
     bucket:
       # -- Path to the archive file
       output: slo-reporting.csv
@@ -46,30 +46,42 @@ config:
     enabled: true
     # -- Scrape interval of alert sources
     interval: PT1M
+    # -- List of alert monitors to aggregate
     monitors:
-      azure: []
-      #  - name: azure
-      #    subscription_id: XXXXXX-XXXX-XXXXXX-XXXX-XXXXXX
-      prometheus: []
-      #  - name: prometheus
-      #    url: http://localhost:9090
-      #    query: 'ALERTS{alertstate="firing", severity="critical", relevance="health-status"}'
-      alertmanager: []
-      #  - name: alertmanager
-      #    url: http://localhost:9093/api/v2/alerts
-      #    filters:
-      #      - "receiver=email"
-      #      - "severity=critical"
-      #      - "relevance=health-status"
-      #    active: True
-      #    silenced: False
-      #    inhibited: False
-      #    unprocessed: False
-
+      # -- List of Azure Monitors
+      azure:
+        # -- An example of an Azure monitor
+        - name: azure-project-1
+          # -- Azure Subscription ID
+          subscription_id: XXXXXX-XXXX-XXXXXX-XXXX-XXXXXX
+      # -- List of Prometheus Monitors
+      prometheus:
+        # -- An example of a Prometheus monitor
+        - name: prometheus-project-1
+          # -- Prometheus URL to query
+          url: http://prometheus-operated.observability:9090
+          # -- Prometheus query to evaluate
+          query: 'ALERTS{alertstate="firing", severity="critical", relevance="health-status"}'
+      # -- List of a Alertmanager Monitors
+      alertmanager:
+        # -- An example of an Alertmanager monitor
+        - name: alertmanager-project1
+          # -- Alertmanager URL to query
+          url: http://alertmanager-operated.observability:9093/api/v2/alerts
+          # -- List of filters to apply, cf. [AlertManager OpenAPI](https://github.com/prometheus/alertmanager/blob/main/api/v2/openapi.yaml)
+          filters:
+            - "receiver=email"
+            - "severity=critical"
+            - "relevance=health-status"
+          active: True
+          silenced: False
+          inhibited: False
+          unprocessed: False
 #--------
 image:
+  # -- The image repository to pull from
   repository: ghcr.io/colenio/slo-reporting
-  # Overrides the image tag whose default is the chart appVersion.
+  # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
   pullPolicy: IfNotPresent
 
@@ -85,12 +97,12 @@ serviceAccount:
 
 resources: {}
 
-# -- Auto scaling via [HPA](https://docs.microsoft.com/en-us/azure/aks/tutorial-kubernetes-scale#autoscale-pods)
 autoscaling:
+  # -- Enable auto scaling via [HPA](https://docs.microsoft.com/en-us/azure/aks/tutorial-kubernetes-scale#autoscale-pods)
   enabled: false
   minReplicas: 1
   maxReplicas: 4
-  #targetCPUUtilizationPercentage: 80 # Disable cpu metrics since no limit (see above)
+  targetCPUUtilizationPercentage: 80
   targetMemoryUtilizationPercentage: 80
 
 # -- Networking
@@ -99,6 +111,7 @@ service:
   type: ClusterIP
 
 ingress:
+  # -- Enable Ingress
   enabled: false
   className: "" # nginx
   annotations: {}
@@ -106,6 +119,7 @@ ingress:
   tls: []
 
 metrics:
+  # -- Enable Prometheus metrics
   enabled: true
   serviceMonitor: # TODO: document
     # -- Enable a [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#servicemonitorspec)
