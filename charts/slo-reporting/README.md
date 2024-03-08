@@ -1,6 +1,6 @@
 # slo-reporting
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.1](https://img.shields.io/badge/AppVersion-0.2.1-informational?style=flat-square)
+![Version: 0.2.5](https://img.shields.io/badge/Version-0.2.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.13](https://img.shields.io/badge/AppVersion-0.2.13-informational?style=flat-square)
 
 Excel compatible SLO reporting tool for Prometheus.
 
@@ -26,7 +26,7 @@ Kubernetes: `>= 1.26.3`
 |-----|------|---------|-------------|
 | autoscaling | object | `{"enabled":false,"maxReplicas":4,"minReplicas":1,"targetMemoryUtilizationPercentage":80}` | Auto scaling via [HPA](https://docs.microsoft.com/en-us/azure/aks/tutorial-kubernetes-scale#autoscale-pods) |
 | config.cronjob.enabled | bool | `true` |  |
-| config.cronjob.schedule | string | `"0 23 * * *"` | The cronjob schedule for running the job (default: nightly at 2AM) |
+| config.cronjob.schedule | string | `"@daily"` | The cronjob schedule for running the export-metrics job (default: nightly at 2AM) |
 | config.metrics.bucket.name | string | `"slo-reports"` | Azure File Share to store slo reports |
 | config.metrics.bucket.output | string | `"slo-reporting.csv"` | Path to the archive file |
 | config.metrics.bucket.path | string | `"/app/data"` | Mount path in pod |
@@ -34,7 +34,7 @@ Kubernetes: `>= 1.26.3`
 | config.metrics.bucket.type | string | `"azure"` | Type of bucket to use (azure, gcs, s3) |
 | config.metrics.enabled | bool | `true` | Should SLO reports be generated from configured SLOs |
 | config.metrics.prometheus.url | string | `"http://prometheus-community-kube-prometheus.observability:9090"` | Prometheus URL to query |
-| config.metrics.slo | list | `[{"goal":99.9,"name":"prometheus-uptime","query":"100 * sum(min_over_time(up{job=\"prometheus\"}[15m])) by (job)","rolling_period":"P1W","step":"P1D"}]` | List of SLOs to report on |
+| config.metrics.slo | list | `[{"goal":99.9,"name":"prometheus-uptime","query":"100 * avg(avg_over_time(up{job=~\"prometheus.*\"}[5m]))","step":"P1D","window":"P1W"},{"goal":99.9,"name":"slo","query":"100 * pyrra_availability","step":"P1D","window":"P1M"}]` | List of SLOs to report on |
 | config.metrics.step | string | `"P1D"` | In what granularity (step-size) should SLOs be reported |
 | config.metrics.window | string | `"P1W"` | Evaluation window for SLOs |
 | config.status.enabled | bool | `true` | Should a status API be created which aggregates alerts from multiple sources? |

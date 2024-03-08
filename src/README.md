@@ -1,4 +1,4 @@
-# Python (Fast API)
+# Service Level Objective Reporting
 
 ## Development
 
@@ -52,7 +52,6 @@ INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
 
 # Tests
 $ python -m pytest --mypy --cov --cov-fail-under=75
-tests\api\test_readings.py .                                           [100%]
 
 ============================= 1 passed in 0.05s =============================
 ```

@@ -9,10 +9,10 @@ metrics:
   objectives:
     - name: "prometheus-uptime" # Default prometheus example
       goal: 99.9
-      query: 100 * avg(avg_over_time(up{job=~"prometheus.*"}[15m]))
-#    - name: "slo" # Pyrra Example
-#      goal: 99.9
-#      query: 100 * pyrra_objective
+      query: 100 * avg(avg_over_time(up{job=~"prometheus.*"}[5m]))
+    - name: "slo" # Pyrra Example
+      goal: 99.9
+      query: 100 * pyrra_availability
 
 status:
   enabled: True

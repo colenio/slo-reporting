@@ -25,6 +25,11 @@ config:
         goal: 99.9 # 99.9% uptime, default
         window: P1W # 1 week, default
         step: P1D # 1 day, default
+      - name: "slo" # Pyrra Example
+        query: 100 * pyrra_availability
+        goal: 99.9 # 99.9% uptime, default
+        window: P1M # 1 month default
+        step: P1D # 1 day, default
     bucket:
       # -- Path to the archive file
       output: slo-reporting.csv
