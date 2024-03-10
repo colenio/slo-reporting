@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import requests_mock
 
@@ -10,7 +10,7 @@ def test_prometheus_monitor() -> None:
     monitor = PrometheusMonitor.of(config)
     assert monitor.type == 'prometheus'
 
-    timestamp = datetime.utcnow()
+    timestamp = datetime.now(timezone.utc)
     with requests_mock.Mocker() as m:
         m.get(
             url=f'{config.url}/api/v1/query?query={config.query}',

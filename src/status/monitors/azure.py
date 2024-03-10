@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 
 from azure.core.credentials import TokenCredential
@@ -40,5 +40,5 @@ class AzureMonitor(Monitor):
         essentials = props.essentials or Essentials()
         description = essentials.additional_properties.get('description', '')
         url = essentials.alert_rule or ''
-        timestamp = essentials.start_date_time or datetime.utcnow()
+        timestamp = essentials.start_date_time or datetime.now(timezone.utc)
         return Alert(type=self.type, name=az_alert.name, description=description, url=url, timestamp=timestamp)

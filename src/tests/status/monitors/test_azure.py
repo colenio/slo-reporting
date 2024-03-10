@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import create_autospec
 
 import requests_mock
@@ -17,7 +17,7 @@ def test_azure_monitor() -> None:
 
     # az_alert = AzAlert(name='test', properties=None)
     # alerts_client.get_all.return_value = [az_alert]
-    timestamp = datetime.utcnow()
+    timestamp = datetime.now(timezone.utc)
     with requests_mock.Mocker() as m:
         # Example response: https://learn.microsoft.com/en-us/rest/api/monitor/alertsmanagement/alerts/get-all
         # @formatter:off

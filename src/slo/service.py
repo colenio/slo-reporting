@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 from typing import Mapping
 
 import pandas as pd
@@ -26,7 +27,7 @@ class SloService:
     metrics: Metrics = settings.metrics
 
     @property
-    def path(self):
+    def path(self) -> Path:
         return self.metrics.path
 
     def get_slo_values(self) -> Mapping[str, SloValue]:

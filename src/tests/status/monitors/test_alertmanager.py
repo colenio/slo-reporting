@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 import requests_mock
@@ -44,7 +44,7 @@ def test_alertmanager() -> None:
     with pytest.raises(ValidationError):
         config.model_validate({'receiver': '(invalid regex'})
 
-    timestamp = datetime.utcnow()
+    timestamp = datetime.now(timezone.utc)
     with requests_mock.Mocker() as m:
         # @formatter:off
         m.get(url, json=[{

@@ -1,5 +1,5 @@
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Dict, Any
 
 from pydantic import Field, field_validator
@@ -64,7 +64,7 @@ class AlertManagerMonitor(Monitor):
         return alerts
 
     def alert_of(self, result: Dict[str, Any]) -> Alert:
-        timestamp = datetime.fromisoformat(result.get('startsAt', datetime.utcnow().isoformat()))
+        timestamp = datetime.fromisoformat(result.get('startsAt', datetime.now(timezone.utc).isoformat()))
 
         labels: Dict[str, str] = result.get('labels', {})
         name = labels.get('alertname', 'Unknown')
