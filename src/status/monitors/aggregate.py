@@ -2,8 +2,8 @@ from typing import List
 
 from pydantic import TypeAdapter
 
-from models.settings import settings
-from monitors.models import Monitor, Alert
+from config.settings import settings
+from status.monitors.models import Monitor, Alert
 
 
 class AggregateMonitor(Monitor):

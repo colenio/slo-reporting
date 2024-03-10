@@ -5,7 +5,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi_restful.cbv import cbv
 from starlette.responses import JSONResponse
 
-from models.settings import settings
+from config.settings import settings
 
 router = APIRouter()
 

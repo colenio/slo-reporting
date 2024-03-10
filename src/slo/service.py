@@ -1,49 +1,48 @@
 from datetime import datetime
+from typing import Mapping
 
 import pandas as pd
-from fastapi import APIRouter
-from fastapi.encoders import jsonable_encoder
-from fastapi_restful.cbv import cbv
 from pandas import DataFrame
-from starlette.responses import FileResponse, Response, JSONResponse
+from pydantic import BaseModel
 
-from models.settings import settings, ServiceLevelObjective, Metrics
+from config.settings import settings
+from slo.config import Metrics, ServiceLevelObjective
 
-router = APIRouter()
+
+class SloValue(BaseModel):
+    value: float
+    goal: float
+
+    @property
+    def style(self) -> str:
+        if self.value >= self.goal:
+            return "success"
+        if self.value >= self.goal * 0.80:
+            return "warning"
+        return "danger"
 
 
-@cbv(router)
-class SloController:
+class SloService:
     metrics: Metrics = settings.metrics
 
-    @router.post("/_update")
-    def update(self, force: bool = True) -> Response:
-        df = self._update(force)
-        df.to_csv(self.metrics.path)
-        return Response(status_code=204)
+    @property
+    def path(self):
+        return self.metrics.path
 
-    @router.get("/export/csv")
-    def export_csv(self) -> FileResponse:
-        self.update(False)
-        path = self.metrics.path
-        return FileResponse(path, media_type="text/csv", filename=path.name)
+    def get_slo_values(self) -> Mapping[str, SloValue]:
+        client = self.metrics.prometheus.client
+        result = {}
+        for slo in self.metrics.objectives:
+            metrics = client.custom_query(query=slo.query)
+            goals = client.custom_query(query=slo.goal_query) if slo.goal_query else []
+            for i, metric in enumerate(metrics):
+                name = metric.get("metric", {}).get(slo.name, slo.name)
+                value = metric["value"][1]
+                goal = goals[i]["value"][1] if goals else slo.goal
+                result[name] = SloValue(value=value, goal=goal)
+        return result
 
-    @router.get("/export/json")
-    def export_json(self) -> JSONResponse:
-        df = self._update(False)
-        content = jsonable_encoder(df.to_dict())
-        return JSONResponse(content=content)
-
-    @router.get("/export/xlsx")
-    def export_xlsx(self) -> FileResponse:
-        df = self._update(False)
-        file_name = self.metrics.path.with_suffix(".xlsx")
-        df.to_excel(file_name)
-        # https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
-        return FileResponse(file_name, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                            filename=file_name.name)
-
-    def _update(self, force: bool = True) -> DataFrame:
+    def get_slo_window(self, force: bool = True) -> DataFrame:
         path = self.metrics.path
         need_update = force or not path.exists() or path.stat().st_mtime < self.metrics.now.timestamp()
         df = self._read_archive()
@@ -51,6 +50,10 @@ class SloController:
             return df
         df_slo = self._read_objectives()
         df = df.combine_first(df_slo)
+
+        df.attrs["updated"] = datetime.now().isoformat()
+        df.attrs["file_name"] = path.name
+
         return df
 
     def _read_objectives(self) -> DataFrame:

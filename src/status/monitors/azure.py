@@ -1,4 +1,3 @@
-import logging
 from datetime import datetime
 from typing import List
 
@@ -7,9 +6,14 @@ from azure.identity import DefaultAzureCredential
 from azure.mgmt.alertsmanagement import AlertsManagementClient
 from azure.mgmt.alertsmanagement.models import Alert as AzAlert, AlertProperties, Essentials
 from azure.mgmt.alertsmanagement.models import MonitorCondition
+from pydantic import Field
 
-from models.settings import AzureMonitorConfig
-from monitors.models import Alert, Monitor
+from status.monitors.models import Alert, Monitor, MonitorConfig
+
+
+class AzureMonitorConfig(MonitorConfig):
+    name: str = Field(default="azure")
+    subscription_id: str
 
 
 class AzureMonitor(Monitor):

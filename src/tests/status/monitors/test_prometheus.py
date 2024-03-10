@@ -2,8 +2,7 @@ from datetime import datetime
 
 import requests_mock
 
-from models.settings import PrometheusMonitorConfig
-from monitors.prometheus import PrometheusMonitor
+from status.monitors.prometheus import PrometheusMonitor, PrometheusMonitorConfig
 
 
 def test_prometheus_monitor() -> None:

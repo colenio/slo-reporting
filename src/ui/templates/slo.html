@@ -1,13 +1,29 @@
 {% extends "_layout.html" %}
 <!-- prettier-ignore -->
-{% block title %}SLO{% endblock %}
+{% block title %}Service Level Objectives{% endblock %}
 {% block content %}
-<section class="hero">
-  <div class="hero-body">
-    <div class="container">
-      <h1 class="title">SLO</h1>
-      TODO
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title">Service Level Objectives</h1>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+          {% for name, slo in slo.items() %}
+            <div class="col">
+              <div class="card text-center bg-{{ slo.style }}">
+                <div class="card-header">
+                  <h5 class="card-title">{{ name }}</h5>
+                </div>
+                <div class="card-body">
+                  <p class="card-text fs-1">{{ slo.value | round(2) }} %</p>
+                </div>
+                <div class="card-footer">
+                  <p class="card-text">Goal: {{ slo.goal }} %</p>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 {% endblock %}

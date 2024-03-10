@@ -13,6 +13,7 @@ metrics:
     - name: "slo" # Pyrra Example
       goal: 99.9
       query: 100 * pyrra_availability
+      goal_query: 100 * pyrra_objective
 
 status:
   enabled: True

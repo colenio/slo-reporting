@@ -5,7 +5,7 @@ import requests_mock
 from azure.core.credentials import TokenCredential
 from azure.mgmt.alertsmanagement import AlertsManagementClient
 
-from monitors.azure import AzureMonitor
+from status.monitors.azure import AzureMonitor
 
 
 def test_azure_monitor() -> None:

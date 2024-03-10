@@ -4,24 +4,26 @@ import uvicorn
 from fastapi import FastAPI, APIRouter
 from fastapi_restful.tasks import repeat_every
 
-from api import config, slo, status
-from models.settings import settings
-from monitors.aggregate import AggregateMonitor
-from monitors.alertmanager import AlertManagerMonitor
-from monitors.azure import AzureMonitor
-from monitors.models import Monitor
-from monitors.prometheus import PrometheusMonitor
+import config.api
+import slo.api
+import status.api
+from config.settings import settings
 from observability import add_observability
+from status.monitors.aggregate import AggregateMonitor
+from status.monitors.alertmanager import AlertManagerMonitor
+from status.monitors.azure import AzureMonitor
+from status.monitors.models import Monitor
+from status.monitors.prometheus import PrometheusMonitor
 from ui import add_ui
 
 
 def add_api(the_app: FastAPI) -> None:
     api_router = APIRouter()
-    api_router.include_router(config.router, prefix="/config", tags=["config"])
+    api_router.include_router(config.api.router, prefix="/config", tags=["config"])
     if settings.metrics.enabled:
-        api_router.include_router(slo.router, prefix="/slo", tags=["slo"])
+        api_router.include_router(slo.api.router, prefix="/slo", tags=["slo"])
     if settings.status.enabled:
-        api_router.include_router(status.router, prefix="/status", tags=["status"])
+        api_router.include_router(status.api.router, prefix="/status", tags=["status"])
     the_app.include_router(api_router, prefix=settings.api_base)
 
 

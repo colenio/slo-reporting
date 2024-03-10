@@ -3,9 +3,18 @@ from datetime import datetime
 from typing import List, Dict, Any
 
 from prometheus_api_client import PrometheusConnect
+from pydantic import Field, SecretStr
 
-from models.settings import PrometheusMonitorConfig
-from monitors.models import Monitor, Alert
+from status.monitors.models import Monitor, Alert, MonitorConfig
+
+
+class PrometheusMonitorConfig(MonitorConfig):
+    name: str = Field(default='prometheus')
+    url: str = Field(default='http://localhost:9090')
+    user: str = Field(default='')
+    password: SecretStr = Field(default=SecretStr(''))
+    ssl_verify: bool = Field(default=False)
+    query: str = Field(default='ALERTS{alertstate="firing", severity="critical", relevance="health-status"}')
 
 
 class PrometheusMonitor(Monitor):

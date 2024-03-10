@@ -4,6 +4,10 @@ from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
 
 
+class MonitorConfig(BaseModel):
+    pass
+
+
 class Alert(BaseModel):
     model_config = ConfigDict(ser_json_timedelta='iso8601')
 

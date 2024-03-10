@@ -4,8 +4,7 @@ import pytest
 import requests_mock
 from pydantic import ValidationError
 
-from models.settings import AlertManagerConfig
-from monitors.alertmanager import AlertManagerMonitor
+from status.monitors.alertmanager import AlertManagerMonitor, AlertManagerConfig
 
 
 def test_alertmanager() -> None:
