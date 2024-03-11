@@ -3,19 +3,34 @@ image:
 imagePullSecrets:
   - name: image-pull-secret
 ingress:
-  enabled: true
-  className: nginx
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
-  hosts:
-    - host: status.playground.colenio.com
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls:
-    - secretName: slo-reporting-tls
-      hosts:
-        - status.playground.colenio.com
+  api:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+    hosts:
+      - host: status.playground.colenio.com
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: slo-reporting-api-tls
+        hosts:
+          - status.playground.colenio.com
+  ui:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+    hosts:
+      - host: slo.playground.colenio.com
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: slo-reporting-ui-tls
+        hosts:
+          - slo.playground.colenio.com
 
 resources:
   limits:

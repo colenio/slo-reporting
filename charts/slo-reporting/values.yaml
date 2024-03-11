@@ -16,7 +16,7 @@ config:
       # -- Prometheus URL to query
       url: http://prometheus-community-kube-prometheus.observability:9090
     # -- Evaluation window for SLOs
-    window: P1W
+    window: P1M # 1 month
     # -- In what granularity (step-size) should SLOs be reported
     step: P1D
     # -- List of SLOs to report on
@@ -30,6 +30,7 @@ config:
       - name: "slo"
         goal: 99.9
         query: 100 * pyrra_availability
+        goal_query: 100 * pyrra_objective
     bucket:
       # -- Path to the archive file
       output: slo-reporting.csv
@@ -118,12 +119,20 @@ service:
   type: ClusterIP
 
 ingress:
-  # -- Enable Ingress
-  enabled: false
-  className: "" # nginx
-  annotations: {}
-  hosts: []
-  tls: []
+  ui:
+    # -- Enable UI Ingress
+    enabled: false
+    className: "" # nginx
+    annotations: {}
+    hosts: []
+    tls: []
+  api:
+    # -- Enable API Ingress
+    enabled: false
+    className: "" # nginx
+    annotations: {}
+    hosts: []
+    tls: []
 
 metrics:
   # -- Enable Prometheus metrics

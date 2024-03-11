@@ -1,0 +1,75 @@
+---
+config:
+  cronjob:
+    enabled: true
+    schedule: "@daily"
+  metrics:
+    enabled: true
+    prometheus:
+      url: http://prometheus-operated.observability:9090
+    window: P1M
+    step: P1D
+    slo:
+      - name: "slo"
+        goal: 99.9
+        query: 100 * pyrra_availability
+        goal_query: 100 * pyrra_objective
+    bucket:
+      output: slo-reporting.csv
+      path: /app/data
+      type: azure
+      name: slo-reports
+      secretName: slo-reporting
+  status:
+    enabled: true
+    interval: PT1M
+    monitors:
+      azure: []
+      prometheus: []
+      alertmanager:
+        - name: alertmanager
+          url: http://alertmanager-operated.observability:9093/api/v2/alerts
+          filters:
+            - "receiver=email"
+            - "severity=critical"
+            - "relevance=health-status"
+          active: True
+          silenced: False
+          inhibited: False
+          unprocessed: False
+
+ingress:
+  ui:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      nginx.ingress.kubernetes.io/auth-url: "http://oauth2-proxy.auth.svc.cluster.local/oauth2/auth"
+      nginx.ingress.kubernetes.io/auth-signin: "https://auth.${domain}/oauth2/sign_in?rd=http://$host$request_uri"
+    hosts:
+      - host: slo.${domain}
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: slo-reporting-ui-tls
+        hosts:
+          - slo.${domain}
+  api:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      nginx.ingress.kubernetes.io/auth-type: basic
+      nginx.ingress.kubernetes.io/auth-secret: slo-reporting-api-basic-auth
+      nginx.ingress.kubernetes.io/app-root: /api/status
+      nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+    hosts:
+      - host: status.${domain}
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: slo-reporting-api-tls
+        hosts:
+          - status.${domain}

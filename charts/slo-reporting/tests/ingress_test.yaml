@@ -2,11 +2,49 @@ suite: test ingress
 templates:
   - ingress.yaml
 tests:
-  - it: should render ingress
+  - it: should render ui-ingress
     release:
       name: my-release
     values:
       - values.test.yaml
+    documentSelector:
+      path: metadata.name
+      value: my-release-slo-reporting-ui
+    asserts: # https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md#assertion-types
+      - isKind:
+          of: Ingress
+      - isAPIVersion:
+          of: networking.k8s.io/v1
+      - equal:
+          path: spec.ingressClassName
+          value: nginx
+      - equal:
+          path: spec.tls[0]
+          value:
+            hosts:
+              - slo.playground.colenio.com
+            secretName: slo-reporting-ui-tls
+      - equal:
+          path: spec.rules[0]
+          value:
+            host: slo.playground.colenio.com
+            http:
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: my-release-slo-reporting
+                      port:
+                        number: 8000
+  - it: should render api-ingress
+    release:
+      name: my-release
+    values:
+      - values.test.yaml
+    documentSelector:
+      path: metadata.name
+      value: my-release-slo-reporting-api
     asserts: # https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md#assertion-types
       - isKind:
           of: Ingress
@@ -20,7 +58,7 @@ tests:
           value:
             hosts:
               - status.playground.colenio.com
-            secretName: slo-reporting-tls
+            secretName: slo-reporting-api-tls
       - equal:
           path: spec.rules[0]
           value:

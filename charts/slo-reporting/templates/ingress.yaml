@@ -1,21 +1,23 @@
-{{- if .Values.ingress.enabled -}}
 {{- $fullName := include "slo-reporting.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
+{{- range $key, $val := .Values.ingress -}}
+{{- if $val.enabled }}
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
+  name: "{{ $fullName }}-{{ $key }}"
   labels:
-    {{- include "slo-reporting.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
+    {{- include "slo-reporting.labels" $ | nindent 4 }}
+  {{- with $val.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  ingressClassName: {{ .Values.ingress.className }}
-  {{- if .Values.ingress.tls }}
+  ingressClassName: {{ $val.className }}
+  {{- if $val.tls }}
   tls:
-    {{- range .Values.ingress.tls }}
+    {{- range $val.tls }}
     - hosts:
         {{- range .hosts }}
         - {{ . | quote }}
@@ -24,7 +26,7 @@ spec:
     {{- end }}
   {{- end }}
   rules:
-    {{- range .Values.ingress.hosts }}
+    {{- range $val.hosts }}
     - host: {{ .host | quote }}
       http:
         paths:
@@ -38,4 +40,5 @@ spec:
                   number: {{ $svcPort }}
           {{- end }}
     {{- end }}
+{{- end }}
 {{- end }}

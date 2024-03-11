@@ -26,3 +26,6 @@
 # https://github.com/helm-unittest/helm-unittest?tab=readme-ov-file#get-started
 tests/*_test.yaml
 tests/TEST-*.xml
+
+# Ignore samples
+values.*.yaml
