@@ -47,10 +47,9 @@ class SloService:
         path = self.metrics.path
         need_update = force or not path.exists() or path.stat().st_mtime < self.metrics.now.timestamp()
         df = self._read_archive()
-        if not need_update:
-            return df
-        df_slo = self._read_objectives()
-        df = df.combine_first(df_slo)
+        if need_update:
+            df_slo = self._read_objectives()
+            df = df.combine_first(df_slo)
 
         df.attrs["updated"] = datetime.now().isoformat()
         df.attrs["file_name"] = path.name
@@ -71,7 +70,8 @@ class SloService:
         df = DataFrame()
         for metric in metric_data:
             name = metric.get("metric", {}).get(slo.name, slo.name)
-            df = df.combine_first(DataFrame(metric["values"], columns=["timestamp", name]))
+            df_slo = DataFrame(metric["values"], columns=["timestamp", name])
+            df = df.combine_first(df_slo)
         df["timestamp"] = pd.to_datetime(df["timestamp"], unit="s")
         df.set_index("timestamp", inplace=True)
         return df
@@ -81,3 +81,9 @@ class SloService:
             return pd.read_csv(self.metrics.path, parse_dates=["timestamp"], index_col="timestamp")
         except FileNotFoundError:
             return pd.DataFrame()
+
+
+SLO_SERVICE = SloService()
+
+def get_slo_service() -> SloService:
+    return SLO_SERVICE

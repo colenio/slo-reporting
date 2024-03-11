@@ -1,0 +1,7 @@
+{% macro icon_for(icon_or_url, width=16, height=16) -%}
+  {%- if icon_or_url.startswith('http') -%}
+    <img src="{{ icon_or_url }}" alt="icon" style="width:{{ width }}px;height:{{ height }}px;" />
+  {%- elif 'fa-' in icon_or_url -%}
+    <i class="{{ icon_or_url }}"></i>
+  {%- endif -%}
+{%- endmacro %}

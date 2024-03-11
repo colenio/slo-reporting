@@ -17,13 +17,13 @@
   ></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"
         integrity="sha256-wiz7ZSCn/btzhjKDQBms9Hx4sSeUYsDrTLg7roPstac=" crossorigin="anonymous">
-  <link rel="shortcut icon" href="/static/favico.png"/>
+  <link rel="shortcut icon" href="{{ icons.get('favicon', '/static/favico.png') }}"/>
   {% block header %}{% endblock %}
 </head>
 
 <body>
 <header>
-  <nav class="navbar navbar-expand-lg fixed-top">
+  <nav class="navbar navbar-expand-lg fixed-top bg-white">
     <!-- Collapsible wrapper -->
     <div class="container-fluid">
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -33,11 +33,14 @@
       <!-- Left links -->
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <a class="navbar-brand" href="/">
-          <img src="/static/img/brand.png"/>
+          <img style="width:auto;height:28px;" src="{{ icons.get('brand', '/static/img/brand.png') }}" alt="brand"/>
         </a>
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="/slo">SLO</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/status">Status</a>
           </li>
         </ul>
       </div>
@@ -51,7 +54,7 @@
   </main>
 </div>
 
-<footer class="footer mt-auto fixed-bottom">
+<footer class="footer mt-auto fixed-bottom bg-white">
   <div class="container text-center">
     &copy; {% now 'utc', '%Y' %} | <a href="/about">About</a> |
     <a href="/docs" target="_blank">API Docs</a> |

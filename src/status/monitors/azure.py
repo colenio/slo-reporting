@@ -4,7 +4,7 @@ from typing import List
 from azure.core.credentials import TokenCredential
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.alertsmanagement import AlertsManagementClient
-from azure.mgmt.alertsmanagement.models import Alert as AzAlert, AlertProperties, Essentials
+from azure.mgmt.alertsmanagement.models import Alert as AzAlert, AlertProperties, Essentials, Severity
 from azure.mgmt.alertsmanagement.models import MonitorCondition
 from pydantic import Field
 
@@ -14,6 +14,15 @@ from status.monitors.models import Alert, Monitor, MonitorConfig
 class AzureMonitorConfig(MonitorConfig):
     name: str = Field(default="azure")
     subscription_id: str
+
+
+# https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-common-schema#essentials-fields
+# @formatter:off
+AZURE_SEVERITY_MAP = {
+    'sev0': 'critical',
+    'sev1': 'warning',
+    'sev2': 'warning',
+}
 
 
 class AzureMonitor(Monitor):
@@ -35,10 +44,14 @@ class AzureMonitor(Monitor):
         return alerts
 
     def alert_of(self, az_alert: AzAlert) -> Alert:
-        # @formatter:off
         props = az_alert.properties or AlertProperties()
         essentials = props.essentials or Essentials()
+        severity = AZURE_SEVERITY_MAP.get((essentials.severity or Severity.SEV0).lower(), 'info')
+        timestamp = essentials.start_date_time or datetime.now(timezone.utc)
         description = essentials.additional_properties.get('description', '')
         url = essentials.alert_rule or ''
-        timestamp = essentials.start_date_time or datetime.now(timezone.utc)
-        return Alert(type=self.type, name=az_alert.name, description=description, url=url, timestamp=timestamp)
+        # @formatter:off
+        return Alert(
+            type=self.type, name=az_alert.name, timestamp=timestamp,
+            severity=severity, description=description, url=url
+        )

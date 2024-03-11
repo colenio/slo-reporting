@@ -7,7 +7,7 @@ config:
     enabled: true
     prometheus:
       url: http://prometheus-operated.observability:9090
-    window: P1M
+    window: P30D
     step: P1D
     objectives:
       - name: "slo"

@@ -1,19 +1,20 @@
-{{- if .Values.config.cronjob.enabled }}
+{{- with .Values.config.metrics.cronjob }}
+  {{- if .enabled }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ include "slo-reporting.fullname" . }}-update
+  name: {{ include "slo-reporting.fullname" $ }}-update
   labels:
-    {{- include "slo-reporting.labels" . | nindent 4 }}
+    {{- include "slo-reporting.labels" $ | nindent 4 }}
 spec:
   concurrencyPolicy: Forbid
-  schedule: "{{ .Values.config.cronjob.schedule }}"
+  schedule: "{{ .schedule }}"
   jobTemplate:
     spec:
       template:
         metadata:
           labels:
-            {{- include "slo-reporting.labels" . | nindent 12 }}
+            {{- include "slo-reporting.labels" $ | nindent 12 }}
         spec:
           restartPolicy: Never
           containers:
@@ -23,5 +24,6 @@ spec:
               args:
                 - '-X'
                 - 'POST'
-                - 'http://{{ .Release.Name }}:{{.Values.service.port}}/api/slo/_update'
+                - 'http://{{ include "slo-reporting.fullname" $ }}:{{ $.Values.service.port }}/api/slo/_update'
+  {{- end }}
 {{- end }}

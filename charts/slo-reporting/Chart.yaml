@@ -2,7 +2,7 @@ apiVersion: v2
 name: slo-reporting
 description: Excel compatible SLO reporting tool for Prometheus.
 type: application
-version: "0.3.12"
+version: "0.3.13"
 appVersion: "latest"
 #----
 keywords:

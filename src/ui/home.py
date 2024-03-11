@@ -4,9 +4,10 @@ from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
 from fastapi_restful.cbv import cbv
 from starlette.requests import Request
+from starlette.responses import RedirectResponse
 
 from config.settings import settings
-from ui.deps import TEMPLATES
+from ui.deps import get_templates
 
 router = APIRouter()
 
@@ -15,10 +16,10 @@ router = APIRouter()
 class HomePages:
     @router.get("/", response_class=HTMLResponse)
     @typing.no_type_check
-    async def get_home(self, request: Request):
-        return TEMPLATES.TemplateResponse(request, "index.html")
+    async def get_home(self) -> RedirectResponse:
+        return RedirectResponse("/slo")
 
     @router.get("/about", response_class=HTMLResponse)
     @typing.no_type_check
     async def get_about(self, request: Request):
-        return TEMPLATES.TemplateResponse(request, "about.html", {"settings": settings})
+        return get_templates().TemplateResponse(request, "about.html", {"settings": settings, "config": settings.ui.about})

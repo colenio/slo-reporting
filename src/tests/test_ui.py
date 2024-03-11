@@ -1,15 +1,15 @@
 import typing
 
 from fastapi.testclient import TestClient
+from pytest_mock import MockFixture
 
 
 @typing.no_type_check
 def test_home(client: TestClient) -> None:
     # See https://www.starlette.io/templates/#testing-template-responses
-    response = client.get("/")
-    assert response.status_code == 200
-    assert response.template.name == 'index.html'
-    assert "request" in response.context
+    response = client.get("/", follow_redirects=False)
+    assert response.status_code == 307
+    assert response.next_request.url.path == "/slo"
 
 
 @typing.no_type_check

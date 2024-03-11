@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, Tuple, Type
 
@@ -8,6 +9,7 @@ from pydantic_settings import PydanticBaseSettingsSource, BaseSettings
 from config import PROJECT_ROOT
 from slo.config import Metrics
 from status.config import Status
+from ui.config import UIConfig
 
 
 class YamlConfigSettingsSource(PydanticBaseSettingsSource):
@@ -48,10 +50,12 @@ class Settings(BaseSettings):
     api_base: str = "/api"
     project: str = "slo-reporting"
     stage: str = "dev"
-    version: str = "0.3.0"
+    build_version: str = "0.3.0"
+    build_date: str = datetime.now(timezone.utc).isoformat()
     git_commit: str = "-local-"
     metrics: Metrics = Metrics()
     status: Status = Status()
+    ui: UIConfig = UIConfig()
 
     # https://docs.pydantic.dev/latest/concepts/pydantic_settings/#adding-sources
     @classmethod

@@ -5,9 +5,9 @@ from fastapi_restful.cbv import cbv
 from starlette.requests import Request
 from starlette.responses import HTMLResponse
 
-from slo.deps import get_slo_service
-from slo.service import SloService
-from ui.deps import TEMPLATES
+from config.settings import settings
+from slo.service import SloService, get_slo_service
+from ui.deps import get_templates
 
 router = APIRouter()
 
@@ -20,4 +20,5 @@ class SloPages:
     @typing.no_type_check
     async def get_slo(self, request: Request):
         slo = self.service.get_slo_values()
-        return TEMPLATES.TemplateResponse(request, "slo.html", {"slo": slo})
+        config = settings.ui.slo
+        return get_templates().TemplateResponse(request, "slo.html", {"slo": slo, "config": config})

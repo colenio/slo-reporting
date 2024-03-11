@@ -1,4 +1,6 @@
 {% extends "_layout.html" %}
+{% from "macros.html" import icon_for %}
+
 <!-- prettier-ignore -->
 {% block title %}Service Level Objectives{% endblock %}
 {% block content %}
@@ -6,6 +8,59 @@
     <div class="hero-body">
       <div class="container">
         <h1 class="title">Service Level Objectives</h1>
+        <div class="row mb-3">
+          <div class="col">
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown"
+                      aria-expanded="false">
+                Download
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ url_for('export_xlsx').include_query_params(update=True) }}"><i
+                  class="fas fa-file-excel"></i>
+                  Excel</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('export_csv').include_query_params(update=True) }}"><i
+                  class="fas fa-file-csv"></i>
+                  CSV</a>
+                </li>
+                <li><a class="dropdown-item" href="{{ url_for('export_json').include_query_params(update=True) }}"><i
+                  class="fas fa-file-code"></i>
+                  JSON</a>
+                </li>
+              </ul>
+            </div>
+
+
+            {% if config.links %}
+            <a class="btn btn-outline-primary" data-bs-toggle="offcanvas" href="#offcanvasLinks" role="button"
+               aria-controls="offcanvasLinks">
+              Links
+            </a>
+            <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasLinks"
+                 aria-labelledby="offcanvasExampleLabel">
+              <div class="offcanvas-header">
+                <h4 class="offcanvas-title" id="offcanvasLinks">Links</h4>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                        aria-label="Close"></button>
+              </div>
+              <div class="offcanvas-body">
+                <div>
+                  <ul>
+                    {% for link in config.links %}
+                      <li>
+                        <a class="nav-link" href="{{ link.url }}" target="_blank">
+                          {{ icon_for(link.icon) }}
+                          {{ link.name }}
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
         <div class="row row-cols-1 row-cols-md-3 g-4">
           {% for name, slo in slo.items() %}
             <div class="col">

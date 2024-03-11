@@ -3,20 +3,48 @@
 ## Configuration settings
 ##
 config:
-  cronjob:
-    # -- Should the export-metrics job be enabled
-    enabled: true
-    # -- The cronjob schedule for running the export-metrics job (default: nightly at 2AM)
-    schedule: "@daily"
+  #---
+  ui:
+    icons:
+      favicon: /static/favico.png
+      brand: /static/img/brand.png
+    about:
+      links:
+        - name: colenio/slo-reporting
+          url: https://github.com/colenio/slo-reporting
+          icon: fa-brands fa-github
+    slo:
+      links:
+        - name: Pyrra
+          url: http://localhost:8080
+          icon: "https://raw.githubusercontent.com/pyrra-dev/pyrra/main/ui/public/favicon.ico"
+        - name: Prometheus
+          url: http://localhost:9090
+          icon: "https://raw.githubusercontent.com/prometheus/docs/main/static/favicon.ico"
+    status:
+      links:
+        - name: Grafana
+          url: http://localhost:3000
+          icon: "https://raw.githubusercontent.com/grafana/grafana/main/public/img/fav32.png"
+        - name: Alertmanager
+          url: http://localhost:9093
+          icon: "https://raw.githubusercontent.com/prometheus/alertmanager/main/ui/app/favicon.ico"
+
   #---
   metrics:
     # -- Should SLO reports be generated from configured SLOs
     enabled: true
+    cronjob:
+      # -- Should the export-metrics job be enabled
+      enabled: true
+      # -- The cronjob schedule for running the export-metrics job (default: nightly at 2AM)
+      schedule: "@daily"
+
     prometheus:
       # -- Prometheus URL to query
       url: http://prometheus-community-kube-prometheus.observability:9090
     # -- Evaluation window for SLOs
-    window: P1M # 1 month
+    window: P30D # 1 month
     # -- In what granularity (step-size) should SLOs be reported
     step: P1D
     # -- List of SLOs to report on
@@ -42,6 +70,7 @@ config:
       name: slo-reports
       # -- Name of pre-existing Secret for Azure Storage to use
       secretName: slo-reporting
+  #---
   status:
     # -- Should a status API be created which aggregates alerts from multiple sources?
     enabled: true
@@ -96,15 +125,11 @@ serviceAccount:
   annotations: {}
   name: ""
 
-resources:
-  {}
-  # requests:
-  #   cpu: 3m
-  #   memory: 128Mi
-  # limits:
-  #   cpu: 10m
-  #   memory: 256Mi
+securityContext: {}
+podSecurityContext: {}
+resources: {}
 
+replicaCount: 1
 autoscaling:
   # -- Enable auto scaling via [HPA](https://docs.microsoft.com/en-us/azure/aks/tutorial-kubernetes-scale#autoscale-pods)
   enabled: false

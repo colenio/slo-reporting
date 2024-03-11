@@ -68,9 +68,13 @@ class AlertManagerMonitor(Monitor):
 
         labels: Dict[str, str] = result.get('labels', {})
         name = labels.get('alertname', 'Unknown')
+        severity = labels.get('severity', 'info')
 
         annotations: Dict[str, str] = result.get('annotations', {})
         description = annotations.get('description', '')
         url = annotations.get('dashboard', annotations.get('runbook_url', ''))
 
-        return Alert(type=self.type, name=name, timestamp=timestamp, description=description, url=url)
+        return Alert(
+            type=self.type, name=name, timestamp=timestamp,
+            severity=severity, description=description, url=url
+        )

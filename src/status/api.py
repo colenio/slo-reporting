@@ -1,26 +1,18 @@
-import json
-
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi_restful.cbv import cbv
 from starlette.responses import JSONResponse
 
-from config.settings import settings
+from status.service import StatusService, get_status_service
 
 router = APIRouter()
 
 
 @cbv(router)
 class StatusController:
-    status = settings.status
+    service: StatusService = Depends(get_status_service)
 
     @router.get("/")
-    def get_status(self) -> JSONResponse:
-        status_code = 200
-        json_data = []
-        if self.status.path.exists():
-            with open(file=self.status.path, mode='r', encoding='utf-8') as fp:
-                json_data = json.load(fp)
-        if json_data:
-            status_code = self.status.code
-        return JSONResponse(content=jsonable_encoder(json_data), status_code=status_code)
+    def get_status(self, update: bool = False) -> JSONResponse:
+        alerts, status_code = self.service.get_status(update)
+        return JSONResponse(content=jsonable_encoder(alerts), status_code=status_code)

@@ -1,10 +1,36 @@
+ui:
+  icons:
+    favicon: /static/favico.png
+    brand: /static/img/brand.png
+  about:
+    links:
+      - name: colenio/slo-reporting
+        url: https://github.com/colenio/slo-reporting
+        icon: fa-brands fa-github
+  slo:
+    links:
+      - name: Pyrra
+        url: http://localhost:8080
+        icon: "https://raw.githubusercontent.com/pyrra-dev/pyrra/main/ui/public/favicon.ico"
+      - name: Prometheus
+        url: http://localhost:9090
+        icon: "https://raw.githubusercontent.com/prometheus/docs/main/static/favicon.ico"
+  status:
+    links:
+      - name: Grafana
+        url: http://localhost:3000
+        icon: "https://raw.githubusercontent.com/grafana/grafana/main/public/img/fav32.png"
+      - name: Alertmanager
+        url: http://localhost:9093
+        icon: "https://raw.githubusercontent.com/prometheus/alertmanager/main/ui/app/favicon.ico"
+
 metrics:
   enabled: True
   prometheus:
     url: http://localhost:9090
   archive: ./data/slo-reporting.csv
   # https://en.wikipedia.org/wiki/ISO_8601#Durations
-  window: P1W # P1W, PT1H
+  window: P30D # P1W, PT1H
   step: P1D # P1D, PT1M
   objectives:
     - name: "prometheus-uptime" # Default prometheus example
@@ -30,13 +56,13 @@ status:
       #   query: 'ALERTS{alertstate="firing", severity="critical", relevance="health-status"}'
     alertmanager:
       - name: alertmanager
-        url: http://localhost:9093
+        url: http://localhost:9093/api/v2/alerts
         # https://github.com/prometheus/alertmanager/blob/main/api/v2/openapi.yaml
         active: True
-        filters:
-          - "severity=critical"
-          - "relevance=health-status"
+        filters: []
+#          - "severity=critical"
+#          - "relevance=health-status"
         inhibited: False
-        receiver: '.*' # (email|slack|webhook)
+        receiver: ".*" # (email|slack|webhook)
         silenced: False
         unprocessed: False

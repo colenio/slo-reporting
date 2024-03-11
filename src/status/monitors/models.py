@@ -1,11 +1,20 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class MonitorConfig(BaseModel):
     pass
+
+
+# @formatter:off
+ALERT_STYLES = {
+    'critical': 'danger',
+    'error': 'danger',
+    'fatal': 'danger',
+    'warning': 'warning'
+}
 
 
 class Alert(BaseModel):
@@ -14,8 +23,13 @@ class Alert(BaseModel):
     type: str
     name: str
     timestamp: datetime
+    severity: str = Field(default='critical')
     description: Optional[str] = None
     url: Optional[str] = None
+
+    @property
+    def style(self) -> str:
+        return ALERT_STYLES.get(self.severity.lower(), 'info')
 
 
 class Monitor:

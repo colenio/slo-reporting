@@ -42,11 +42,16 @@ class PrometheusMonitor(Monitor):
         return alerts
 
     def alert_of(self, result: Dict[str, Any]) -> Alert:
-        name = str(result.get('metric', {}).get('alertname', 'Unknown'))
+        metric = result.get('metric', {})
+        name = str(metric.get('alertname', 'Unknown'))
+        severity = str(metric.get('severity', 'info'))
         timestamp = datetime.now(timezone.utc)
         try:
             ts = result.get('value', [0, 0])[0]
             timestamp = datetime.fromtimestamp(ts, timezone.utc)
         except IndexError:
             logging.warning("No timestamp found in result: %s", result)
-        return Alert(type=self.type, name=name, timestamp=timestamp)
+        return Alert(
+            type=self.type, name=name, timestamp=timestamp,
+            severity=severity
+        )
