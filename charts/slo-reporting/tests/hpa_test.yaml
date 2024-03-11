@@ -21,6 +21,13 @@ tests:
           value:
             type: Resource
             resource:
+              name: cpu
+              targetAverageUtilization: 80
+      - equal:
+          path: spec.metrics[1]
+          value:
+            type: Resource
+            resource:
               name: memory
               target:
                 type: Utilization
