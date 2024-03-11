@@ -95,7 +95,14 @@ serviceAccount:
   annotations: {}
   name: ""
 
-resources: {}
+resources:
+  {}
+  # requests:
+  #   cpu: 3m
+  #   memory: 128Mi
+  # limits:
+  #   cpu: 10m
+  #   memory: 256Mi
 
 autoscaling:
   # -- Enable auto scaling via [HPA](https://docs.microsoft.com/en-us/azure/aks/tutorial-kubernetes-scale#autoscale-pods)
