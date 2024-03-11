@@ -47,7 +47,8 @@ tests:
           path: spec.template.spec.containers[0].volumeMounts
           value:
             - name: config
-              mountPath: /app/config
+              mountPath: /app/config/settings.yaml
+              subPath: settings.yaml
               readOnly: true
             - name: bucket
               mountPath: /app/data
@@ -67,12 +68,12 @@ tests:
       - equal: # resources
           path: spec.template.spec.containers[0].resources
           value:
-              limits:
-                cpu: 10m
-                memory: 10Mi
-              requests:
-                cpu: 10m
-                memory: 10Mi
+            limits:
+              cpu: 10m
+              memory: 10Mi
+            requests:
+              cpu: 10m
+              memory: 10Mi
       - equal: # probes
           path: spec.template.spec.containers[0].livenessProbe.httpGet
           value:
