@@ -1,6 +1,6 @@
 # slo-reporting
 
-![Version: 0.3.2](https://img.shields.io/badge/Version-0.3.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: latest](https://img.shields.io/badge/AppVersion-latest-informational?style=flat-square)
+![Version: 0.3.12](https://img.shields.io/badge/Version-0.3.12-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: latest](https://img.shields.io/badge/AppVersion-latest-informational?style=flat-square)
 
 Excel compatible SLO reporting tool for Prometheus.
 
@@ -37,13 +37,13 @@ Kubernetes: `>= 1.26.3`
 | config.metrics.bucket.secretName | string | `"slo-reporting"` | Name of pre-existing Secret for Azure Storage to use |
 | config.metrics.bucket.type | string | `"azure"` | Type of bucket to use (azure, gcs, s3) |
 | config.metrics.enabled | bool | `true` | Should SLO reports be generated from configured SLOs |
+| config.metrics.objectives | list | `[{"goal":99.9,"name":"prometheus-uptime","query":"100 * avg(avg_over_time(up{job=~\"prometheus.*\"}[5m]))"},{"goal":99.9,"goal_query":"100 * pyrra_objective","name":"slo","query":"100 * pyrra_availability"}]` | List of SLOs to report on |
+| config.metrics.objectives[0].goal | float | `99.9` | The goal of the SLO in percentage |
+| config.metrics.objectives[0].query | string | `"100 * avg(avg_over_time(up{job=~\"prometheus.*\"}[5m]))"` | Prometheus query to evaluate |
+| config.metrics.objectives[1] | object | `{"goal":99.9,"goal_query":"100 * pyrra_objective","name":"slo","query":"100 * pyrra_availability"}` | [Pyrra](https://github.com/pyrra-dev/pyrra) Example, `slo` is the metric-label |
 | config.metrics.prometheus.url | string | `"http://prometheus-community-kube-prometheus.observability:9090"` | Prometheus URL to query |
-| config.metrics.slo | list | `[{"goal":99.9,"name":"prometheus-uptime","query":"100 * avg(avg_over_time(up{job=~\"prometheus.*\"}[5m]))"},{"goal":99.9,"name":"slo","query":"100 * pyrra_availability"}]` | List of SLOs to report on |
-| config.metrics.slo[0].goal | float | `99.9` | The goal of the SLO in percentage |
-| config.metrics.slo[0].query | string | `"100 * avg(avg_over_time(up{job=~\"prometheus.*\"}[5m]))"` | Prometheus query to evaluate |
-| config.metrics.slo[1] | object | `{"goal":99.9,"name":"slo","query":"100 * pyrra_availability"}` | [Pyrra](https://github.com/pyrra-dev/pyrra) Example, `slo` is the metric-label |
 | config.metrics.step | string | `"P1D"` | In what granularity (step-size) should SLOs be reported |
-| config.metrics.window | string | `"P1W"` | Evaluation window for SLOs |
+| config.metrics.window | string | `"P1M"` | Evaluation window for SLOs |
 | config.status.enabled | bool | `true` | Should a status API be created which aggregates alerts from multiple sources? |
 | config.status.interval | string | `"PT1M"` | Scrape interval of alert sources |
 | config.status.monitors | object | `{"alertmanager":[{"active":true,"filters":["receiver=email","severity=critical","relevance=health-status"],"inhibited":false,"name":"alertmanager-project1","silenced":false,"unprocessed":false,"url":"http://alertmanager-operated.observability:9093/api/v2/alerts"}],"azure":[{"name":"azure-project-1","subscription_id":"XXXXXX-XXXX-XXXXXX-XXXX-XXXXXX"}],"prometheus":[{"name":"prometheus-project-1","query":"ALERTS{alertstate=\"firing\", severity=\"critical\", relevance=\"health-status\"}","url":"http://prometheus-operated.observability:9090"}]}` | List of alert monitors to aggregate |
@@ -63,11 +63,16 @@ Kubernetes: `>= 1.26.3`
 | image.repository | string | `"ghcr.io/colenio/slo-reporting"` | The image repository to pull from |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | imagePullSecrets | list | `[]` |  |
-| ingress.annotations | object | `{}` |  |
-| ingress.className | string | `""` |  |
-| ingress.enabled | bool | `false` | Enable Ingress |
-| ingress.hosts | list | `[]` |  |
-| ingress.tls | list | `[]` |  |
+| ingress.api.annotations | object | `{}` |  |
+| ingress.api.className | string | `""` |  |
+| ingress.api.enabled | bool | `false` | Enable API Ingress |
+| ingress.api.hosts | list | `[]` |  |
+| ingress.api.tls | list | `[]` |  |
+| ingress.ui.annotations | object | `{}` |  |
+| ingress.ui.className | string | `""` |  |
+| ingress.ui.enabled | bool | `false` | Enable UI Ingress |
+| ingress.ui.hosts | list | `[]` |  |
+| ingress.ui.tls | list | `[]` |  |
 | metrics.enabled | bool | `true` | Enable Prometheus metrics |
 | metrics.serviceMonitor.additionalLabels | list | `[]` |  |
 | metrics.serviceMonitor.enabled | bool | `true` | Enable a [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#servicemonitorspec) |
