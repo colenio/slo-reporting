@@ -9,7 +9,7 @@ config:
       url: http://prometheus-operated.observability:9090
     window: P1M
     step: P1D
-    slo:
+    objectives:
       - name: "slo"
         goal: 99.9
         query: 100 * pyrra_availability

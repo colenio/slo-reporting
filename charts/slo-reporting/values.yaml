@@ -20,7 +20,7 @@ config:
     # -- In what granularity (step-size) should SLOs be reported
     step: P1D
     # -- List of SLOs to report on
-    slo:
+    objectives:
       - name: "prometheus-uptime"
         # -- The goal of the SLO in percentage
         goal: 99.9 # 99.9% uptime, default

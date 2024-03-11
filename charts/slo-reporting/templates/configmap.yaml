@@ -18,8 +18,8 @@ data:
       archive: {{ .bucket.path }}/{{ .bucket.output }}
       window: {{ .window }}
       step: {{ .step }}
-      slo:
-        {{- with .slo }}
+      objectives:
+        {{- with .objectives }}
         {{- toYaml . | trim | nindent 6 }}
         {{- end }}
   {{- end }}
