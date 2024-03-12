@@ -1,6 +1,6 @@
 # slo-reporting
 
-![Version: 0.3.12](https://img.shields.io/badge/Version-0.3.12-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: latest](https://img.shields.io/badge/AppVersion-latest-informational?style=flat-square)
+![Version: 0.3.13](https://img.shields.io/badge/Version-0.3.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: latest](https://img.shields.io/badge/AppVersion-latest-informational?style=flat-square)
 
 Excel compatible SLO reporting tool for Prometheus.
 
@@ -29,13 +29,13 @@ Kubernetes: `>= 1.26.3`
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
 | autoscaling.targetMemoryUtilizationPercentage | int | `80` |  |
-| config.cronjob.enabled | bool | `true` | Should the export-metrics job be enabled |
-| config.cronjob.schedule | string | `"@daily"` | The cronjob schedule for running the export-metrics job (default: nightly at 2AM) |
 | config.metrics.bucket.name | string | `"slo-reports"` | Azure File Share to store slo reports |
 | config.metrics.bucket.output | string | `"slo-reporting.csv"` | Path to the archive file |
 | config.metrics.bucket.path | string | `"/app/data"` | Mount path in pod |
 | config.metrics.bucket.secretName | string | `"slo-reporting"` | Name of pre-existing Secret for Azure Storage to use |
 | config.metrics.bucket.type | string | `"azure"` | Type of bucket to use (azure, gcs, s3) |
+| config.metrics.cronjob.enabled | bool | `true` | Should the export-metrics job be enabled |
+| config.metrics.cronjob.schedule | string | `"@daily"` | The cronjob schedule for running the export-metrics job (default: nightly at 2AM) |
 | config.metrics.enabled | bool | `true` | Should SLO reports be generated from configured SLOs |
 | config.metrics.objectives | list | `[{"goal":99.9,"name":"prometheus-uptime","query":"100 * avg(avg_over_time(up{job=~\"prometheus.*\"}[5m]))"},{"goal":99.9,"goal_query":"100 * pyrra_objective","name":"slo","query":"100 * pyrra_availability"}]` | List of SLOs to report on |
 | config.metrics.objectives[0].goal | float | `99.9` | The goal of the SLO in percentage |
@@ -43,7 +43,7 @@ Kubernetes: `>= 1.26.3`
 | config.metrics.objectives[1] | object | `{"goal":99.9,"goal_query":"100 * pyrra_objective","name":"slo","query":"100 * pyrra_availability"}` | [Pyrra](https://github.com/pyrra-dev/pyrra) Example, `slo` is the metric-label |
 | config.metrics.prometheus.url | string | `"http://prometheus-community-kube-prometheus.observability:9090"` | Prometheus URL to query |
 | config.metrics.step | string | `"P1D"` | In what granularity (step-size) should SLOs be reported |
-| config.metrics.window | string | `"P1M"` | Evaluation window for SLOs |
+| config.metrics.window | string | `"P30D"` | Evaluation window for SLOs |
 | config.status.enabled | bool | `true` | Should a status API be created which aggregates alerts from multiple sources? |
 | config.status.interval | string | `"PT1M"` | Scrape interval of alert sources |
 | config.status.monitors | object | `{"alertmanager":[{"active":true,"filters":["receiver=email","severity=critical","relevance=health-status"],"inhibited":false,"name":"alertmanager-project1","silenced":false,"unprocessed":false,"url":"http://alertmanager-operated.observability:9093/api/v2/alerts"}],"azure":[{"name":"azure-project-1","subscription_id":"XXXXXX-XXXX-XXXXXX-XXXX-XXXXXX"}],"prometheus":[{"name":"prometheus-project-1","query":"ALERTS{alertstate=\"firing\", severity=\"critical\", relevance=\"health-status\"}","url":"http://prometheus-operated.observability:9090"}]}` | List of alert monitors to aggregate |
@@ -58,6 +58,23 @@ Kubernetes: `>= 1.26.3`
 | config.status.monitors.prometheus[0] | object | `{"name":"prometheus-project-1","query":"ALERTS{alertstate=\"firing\", severity=\"critical\", relevance=\"health-status\"}","url":"http://prometheus-operated.observability:9090"}` | An example of a Prometheus monitor |
 | config.status.monitors.prometheus[0].query | string | `"ALERTS{alertstate=\"firing\", severity=\"critical\", relevance=\"health-status\"}"` | Prometheus query to evaluate |
 | config.status.monitors.prometheus[0].url | string | `"http://prometheus-operated.observability:9090"` | Prometheus URL to query |
+| config.ui.about.links[0].icon | string | `"fa-brands fa-github"` |  |
+| config.ui.about.links[0].name | string | `"colenio/slo-reporting"` |  |
+| config.ui.about.links[0].url | string | `"https://github.com/colenio/slo-reporting"` |  |
+| config.ui.icons.brand | string | `"/static/img/brand.png"` |  |
+| config.ui.icons.favicon | string | `"/static/favico.png"` |  |
+| config.ui.slo.links[0].icon | string | `"https://raw.githubusercontent.com/pyrra-dev/pyrra/main/ui/public/favicon.ico"` |  |
+| config.ui.slo.links[0].name | string | `"Pyrra"` |  |
+| config.ui.slo.links[0].url | string | `"http://localhost:8080"` |  |
+| config.ui.slo.links[1].icon | string | `"https://raw.githubusercontent.com/prometheus/docs/main/static/favicon.ico"` |  |
+| config.ui.slo.links[1].name | string | `"Prometheus"` |  |
+| config.ui.slo.links[1].url | string | `"http://localhost:9090"` |  |
+| config.ui.status.links[0].icon | string | `"https://raw.githubusercontent.com/grafana/grafana/main/public/img/fav32.png"` |  |
+| config.ui.status.links[0].name | string | `"Grafana"` |  |
+| config.ui.status.links[0].url | string | `"http://localhost:3000"` |  |
+| config.ui.status.links[1].icon | string | `"https://raw.githubusercontent.com/prometheus/alertmanager/main/ui/app/favicon.ico"` |  |
+| config.ui.status.links[1].name | string | `"Alertmanager"` |  |
+| config.ui.status.links[1].url | string | `"http://localhost:9093"` |  |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/colenio/slo-reporting"` | The image repository to pull from |
@@ -86,7 +103,10 @@ Kubernetes: `>= 1.26.3`
 | metrics.serviceMonitor.targetLabels | list | `[]` |  |
 | nameOverride | string | `""` |  |
 | podAnnotations | object | `{}` |  |
+| podSecurityContext | object | `{}` |  |
+| replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
+| securityContext | object | `{}` |  |
 | service | object | `{"port":8000,"type":"ClusterIP"}` | Networking |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `false` |  |
