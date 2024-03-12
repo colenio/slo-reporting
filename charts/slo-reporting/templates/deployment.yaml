@@ -45,6 +45,8 @@ spec:
               path: /health
               port: {{ .Values.service.port }}
               scheme: HTTP
+          env:
+            {{- toYaml .Values.env | nindent 12 }}          
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:

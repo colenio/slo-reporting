@@ -1,6 +1,6 @@
 # slo-reporting
 
-![Version: 0.3.13](https://img.shields.io/badge/Version-0.3.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: latest](https://img.shields.io/badge/AppVersion-latest-informational?style=flat-square)
+![Version: 0.3.14](https://img.shields.io/badge/Version-0.3.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: latest](https://img.shields.io/badge/AppVersion-latest-informational?style=flat-square)
 
 Excel compatible SLO reporting tool for Prometheus.
 
@@ -75,6 +75,7 @@ Kubernetes: `>= 1.26.3`
 | config.ui.status.links[1].icon | string | `"https://raw.githubusercontent.com/prometheus/alertmanager/main/ui/app/favicon.ico"` |  |
 | config.ui.status.links[1].name | string | `"Alertmanager"` |  |
 | config.ui.status.links[1].url | string | `"http://localhost:9093"` |  |
+| env | object | `{}` |  |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/colenio/slo-reporting"` | The image repository to pull from |

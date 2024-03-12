@@ -127,6 +127,7 @@ serviceAccount:
 
 securityContext: {}
 podSecurityContext: {}
+env: {}
 resources: {}
 
 replicaCount: 1
