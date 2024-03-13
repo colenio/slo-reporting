@@ -1,47 +1,46 @@
-{% extends "_layout.html" %}
-{% from "macros.html" import icon_for %}
+{% extends "_layout.html" %} {% from "macros.html" import icon_for %}
 
 <!-- prettier-ignore -->
 {% block title %}About{% endblock %}
 {% block content %}
-  <section class="hero">
-    <div class="hero-body">
-      <div class="container">
-        <h1 class="title">About</h1>
-        <h4 class="subtitle">{{ settings.project | default('-unknown-') }}</h4>
+<section class="hero">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">About</h1>
+      <h4 class="subtitle">{{ settings.project | default('-unknown-') }}</h4>
 
-        <table class="table is-striped is-narrow is-pulled-left">
-          <tr>
-            <td class="has-text-left">Environment</td>
-            <td class="has-text-right">{{ settings.stage }}</td>
-          </tr>
-          <tr>
-            <td class="has-text-left">Build Version</td>
-            <td class="has-text-right">
-              {{ settings.version | default('-unknown-') }}
-            </td>
-          </tr>
-          <tr>
-            <td class="has-text-left">Git Commit</td>
-            <td class="has-text-right">{{ settings.git_commit | default('-unknown-') }}</td>
-          </tr>
-        </table>
+      <table class="table is-striped is-narrow is-pulled-left">
+        <tr>
+          <td class="has-text-left">Environment</td>
+          <td class="has-text-right">{{ settings.stage }}</td>
+        </tr>
+        <tr>
+          <td class="has-text-left">Build Version</td>
+          <td class="has-text-right">
+            {{ settings.build_version | default('-unknown-') }}
+          </td>
+        </tr>
+        <tr>
+          <td class="has-text-left">Git Commit</td>
+          <td class="has-text-right">
+            {{ settings.git_commit | default('-unknown-') }}
+          </td>
+        </tr>
+      </table>
 
-        <div>
-          <h4>Links</h4>
-          <ul>
-            {% for link in config.links %}
-              <li>
-                <a class="nav-link" href="{{ link.url }}" target="_blank">
-                  {{ icon_for(link.icon) }}
-                  {{ link.name }}
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
-
+      <div>
+        <h4>Links</h4>
+        <ul>
+          {% for link in config.links %}
+          <li>
+            <a class="nav-link" href="{{ link.url }}" target="_blank">
+              {{ icon_for(link.icon) }} {{ link.name }}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 {% endblock %}
