@@ -56,7 +56,6 @@ config:
         query: 100 * avg(avg_over_time(up{job=~"prometheus.*"}[5m]))
       # -- [Pyrra](https://github.com/pyrra-dev/pyrra) Example, `slo` is the metric-label
       - name: "slo"
-        goal: 99.9
         query: 100 * pyrra_availability
         goal_query: 100 * pyrra_objective
     bucket:

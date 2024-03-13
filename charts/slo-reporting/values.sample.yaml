@@ -11,7 +11,6 @@ config:
     step: P1D
     objectives:
       - name: "slo"
-        goal: 99.9
         query: 100 * pyrra_availability
         goal_query: 100 * pyrra_objective
     bucket:

@@ -1,6 +1,7 @@
 from datetime import timedelta, datetime, timezone
 
 from config.settings import Settings
+from slo.config import ServiceLevelObjective
 
 
 def test_settings() -> None:
@@ -26,3 +27,9 @@ def test_settings() -> None:
     slo = metrics.objectives[0]
     assert slo.name == "prometheus-uptime"
     assert slo.goal == 99.9
+
+
+def test_metrics() -> None:
+    slo = ServiceLevelObjective(goal_query="100 * pyrra_objective")
+    assert slo.goal_query == "100 * pyrra_objective"
+    assert slo.goal == 99.9, "default goal"
