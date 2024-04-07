@@ -68,7 +68,7 @@
           "type": "string"
         },
         "datasourceUid": {
-          "type": "integer"
+          "type": "string"
         },
         "queryType": {
           "type": "string"
