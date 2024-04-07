@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/colenio/slo-reporting/blob/main/schemas/grafana-alert-group-schema.json",
+  "$comment": "v0.1.0",
+  "title": "Grafana Alert Group schema",
+  "description": "A grafana alert group definition",
+  "oneOf": [
+    {
+      "$ref": "#/definitions/grafanaAlertGroups"
+    },
+    {
+      "type": "string",
+      "pattern": "^$"
+    }
+  ],
+  "definitions": {
+    "definitions": {
+      "grafanaAlertGroups": {
+        "type": "object",
+        "properties": {
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/grafanaAlertGroup"
+            }
+          }
+        }
+      },
+      "grafanaAlertGroup": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "orgId": {
+            "type": "integer"
+          },
+          "folder": {
+            "type": "string"
+          },
+          "interval": {
+            "type": "string"
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/grafanaAlertRule"
+            }
+          }
+        }
+      },
+      "grafanaAlertRule": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "condition": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/grafanaAlertQuery"
+            }
+          }
+        }
+      },
+      "grafanaAlertQuery": {
+        "type": "object",
+        "properties": {
+          "refId": {
+            "type": "string"
+          },
+          "datasourceId": {
+            "type": "integer"
+          },
+          "queryType": {
+            "type": "string"
+          },
+          "model": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      }
+    }
+  }
+}
