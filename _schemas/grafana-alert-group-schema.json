@@ -14,74 +14,72 @@
     }
   ],
   "definitions": {
-    "definitions": {
-      "grafanaAlertGroups": {
-        "type": "object",
-        "properties": {
-          "groups": {
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/grafanaAlertGroup"
-            }
+    "grafanaAlertGroups": {
+      "type": "object",
+      "properties": {
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/grafanaAlertGroup"
           }
         }
-      },
-      "grafanaAlertGroup": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "orgId": {
-            "type": "integer"
-          },
-          "folder": {
-            "type": "string"
-          },
-          "interval": {
-            "type": "string"
-          },
-          "rules": {
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/grafanaAlertRule"
-            }
+      }
+    },
+    "grafanaAlertGroup": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "orgId": {
+          "type": "integer"
+        },
+        "folder": {
+          "type": "string"
+        },
+        "interval": {
+          "type": "string"
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/grafanaAlertRule"
           }
         }
-      },
-      "grafanaAlertRule": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string"
-          },
-          "condition": {
-            "type": "string"
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/grafanaAlertQuery"
-            }
+      }
+    },
+    "grafanaAlertRule": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "condition": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/grafanaAlertQuery"
           }
         }
-      },
-      "grafanaAlertQuery": {
-        "type": "object",
-        "properties": {
-          "refId": {
-            "type": "string"
-          },
-          "datasourceId": {
-            "type": "integer"
-          },
-          "queryType": {
-            "type": "string"
-          },
-          "model": {
-            "type": "object",
-            "additionalProperties": true
-          }
+      }
+    },
+    "grafanaAlertQuery": {
+      "type": "object",
+      "properties": {
+        "refId": {
+          "type": "string"
+        },
+        "datasourceId": {
+          "type": "integer"
+        },
+        "queryType": {
+          "type": "string"
+        },
+        "model": {
+          "type": "object",
+          "additionalProperties": true
         }
       }
     }
