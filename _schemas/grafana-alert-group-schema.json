@@ -71,7 +71,7 @@
         "refId": {
           "type": "string"
         },
-        "datasourceId": {
+        "datasourceUid": {
           "type": "integer"
         },
         "queryType": {
