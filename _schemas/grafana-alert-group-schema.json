@@ -7,10 +7,6 @@
   "oneOf": [
     {
       "$ref": "#/definitions/grafanaAlertGroups"
-    },
-    {
-      "type": "string",
-      "pattern": "^$"
     }
   ],
   "definitions": {
