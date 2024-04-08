@@ -50,8 +50,12 @@
         "title": {
           "type": "string"
         },
-        "condition": {
+        "uid": {
           "type": "string"
+        },
+        "condition": {
+          "type": "string",
+          "default": "C"
         },
         "data": {
           "type": "array",
@@ -65,13 +69,27 @@
       "type": "object",
       "properties": {
         "refId": {
-          "type": "string"
+          "type": "string",
+          "default": "A"
         },
         "datasourceUid": {
           "type": "string"
         },
         "queryType": {
           "type": "string"
+        },
+        "relativeTimeRange": {
+          "type": "object",
+          "properties": {
+            "from": {
+              "type": "integer",
+              "default": 600
+            },
+            "to": {
+              "type": "integer",
+              "default": 0
+            }
+          
         },
         "model": {
           "type": "object",
