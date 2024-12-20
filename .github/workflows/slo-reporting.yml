@@ -35,10 +35,10 @@ jobs:
         run: |
           set -ex
           export BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          docker-compose build ${COMPONENT}
+          docker compose build ${COMPONENT}
           docker tag ${CR_BASE}/${COMPONENT}:${BUILD_VERSION} ${CR_BASE}/${COMPONENT}:latest
           echo ${{ secrets.GITHUB_TOKEN }} | docker login ${CR_BASE} -u ${{ github.actor }} --password-stdin
-          docker-compose push ${COMPONENT}
+          docker compose push ${COMPONENT}
           docker push ${CR_BASE}/${COMPONENT}:latest
         env:
           CR_BASE: "ghcr.io/${{ github.repository_owner }}"
