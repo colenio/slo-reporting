@@ -2,8 +2,8 @@ apiVersion: v2
 name: slo-reporting
 description: Excel compatible SLO reporting tool for Prometheus / Pyrra.
 type: application
-version: "0.3.18"
-appVersion: "0.3.18"
+version: "0.3.31"
+appVersion: "0.3.31"
 #----
 keywords:
   - colenio

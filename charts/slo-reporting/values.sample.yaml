@@ -36,6 +36,40 @@ config:
           silenced: False
           inhibited: False
           unprocessed: False
+  ui:
+    icons:
+      favicon: /static/favico.png
+      brand: /static/img/brand.png
+    about:
+      links:
+        - name: colenio/slo-reporting
+          url: https://github.com/colenio/slo-reporting
+          icon: fa-brands fa-github
+    slo:
+      links:
+        - name: Pyrra
+          url: https://pyrra.${domain_name}
+          icon: "https://raw.githubusercontent.com/pyrra-dev/pyrra/main/ui/public/favicon.ico"
+        - name: Prometheus
+          url: https://prometheus.${domain_name}
+          icon: "https://raw.githubusercontent.com/prometheus/docs/main/static/favicon.ico"
+      templates:
+        - name: Pyrra
+          template: "https://pyrra.${domain_name}/objectives?expr={{__name__='{name}'}}"
+        - name: Grafana
+          template: "https://grafana.${domain_name}/d/pyrra-detail/pyrra-detail?var-slo={name}"
+
+    status:
+      links:
+        - name: SLO-Dashboard (Grafana)
+          url: http://grafana.${domain_name}/d/pyrra-list
+          icon: "https://raw.githubusercontent.com/grafana/grafana/main/public/img/fav32.png"
+        - name: Alertmanager
+          url: http://alerts.${domain_name}
+          icon: "https://raw.githubusercontent.com/prometheus/alertmanager/main/ui/app/favicon.ico"
+env:
+  - name: FORWARDED_ALLOW_IPS
+    value: "*"
 
 ingress:
   ui:
@@ -45,6 +79,7 @@ ingress:
       cert-manager.io/cluster-issuer: letsencrypt
       nginx.ingress.kubernetes.io/auth-url: "http://oauth2-proxy.auth.svc.cluster.local/oauth2/auth"
       nginx.ingress.kubernetes.io/auth-signin: "https://auth.${domain}/oauth2/sign_in?rd=http://$host$request_uri"
+      nginx.ingress.kubernetes.io/limit-rps: "5"
     hosts:
       - host: slo.${domain}
         paths:
@@ -63,6 +98,7 @@ ingress:
       nginx.ingress.kubernetes.io/auth-secret: slo-reporting-api-basic-auth
       nginx.ingress.kubernetes.io/app-root: /api/status
       nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+      nginx.ingress.kubernetes.io/limit-rps: "5"
     hosts:
       - host: status.${domain}
         paths:
