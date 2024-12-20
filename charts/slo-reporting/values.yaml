@@ -16,11 +16,20 @@ config:
     slo:
       links:
         - name: Pyrra
-          url: http://localhost:8080
+          url: http://localhost:9099
           icon: "https://raw.githubusercontent.com/pyrra-dev/pyrra/main/ui/public/favicon.ico"
         - name: Prometheus
           url: http://localhost:9090
           icon: "https://raw.githubusercontent.com/prometheus/docs/main/static/favicon.ico"
+        - name: Grafana
+          url: http://localhost:3000
+          icon: "https://raw.githubusercontent.com/grafana/grafana/main/public/img/fav32.png"
+      templates:
+        - name: Pyrra
+          template: "http://localhost:9099/objectives?expr={{__name__='{name}'}}"
+        - name: Grafana
+          template: "http://localhost:3000/d/pyrra-detail/pyrra-detail?var-slo={name}"
+
     status:
       links:
         - name: Grafana
@@ -99,10 +108,10 @@ config:
           url: http://alertmanager-operated.observability:9093/api/v2/alerts
           # -- List of filters to apply, cf. [AlertManager OpenAPI](https://github.com/prometheus/alertmanager/blob/main/api/v2/openapi.yaml)
           filters:
-            - "receiver=email"
             - "severity=critical"
             - "relevance=health-status"
           active: True
+          receiver: ".*" # (email|slack|webhook)
           silenced: False
           inhibited: False
           unprocessed: False

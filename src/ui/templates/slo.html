@@ -70,6 +70,9 @@
                 </div>
                 <div class="card-body">
                   <p class="card-text fs-1">{{ slo.value | round(2) }} %</p>
+                  {% for tpl in config.templates %}
+                  <a href="{{ tpl.link_for({'name':name}) }}" target="_blank" class="btn btn-small btn-{{ slo.style }}">{{ tpl.name }}</a>
+                  {% endfor %}
                 </div>
                 <div class="card-footer">
                   <p class="card-text">Goal: {{ slo.goal }} %</p>

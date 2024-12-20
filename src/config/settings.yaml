@@ -10,11 +10,17 @@ ui:
   slo:
     links:
       - name: Pyrra
-        url: http://localhost:8080
+        url: http://localhost:9099
         icon: "https://raw.githubusercontent.com/pyrra-dev/pyrra/main/ui/public/favicon.ico"
       - name: Prometheus
         url: http://localhost:9090
         icon: "https://raw.githubusercontent.com/prometheus/docs/main/static/favicon.ico"
+    templates:
+      - name: Pyrra
+        template: "http://localhost:9099/objectives?expr={{__name__='{name}'}}"
+      - name: Grafana
+        template: "http://localhost:3000/d/pyrra-detail/pyrra-detail?var-slo={name}"
+
   status:
     links:
       - name: Grafana
@@ -59,8 +65,8 @@ status:
         # https://github.com/prometheus/alertmanager/blob/main/api/v2/openapi.yaml
         active: True
         filters: []
-#          - "severity=critical"
-#          - "relevance=health-status"
+        # - "severity=critical"
+        # - "relevance=health-status"
         inhibited: False
         receiver: ".*" # (email|slack|webhook)
         silenced: False

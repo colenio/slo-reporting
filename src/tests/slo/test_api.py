@@ -6,7 +6,6 @@ from starlette.testclient import TestClient
 from config.settings import settings
 
 
-@pytest.mark.skip("TODO")
 def test_slo_export(client: TestClient) -> None:
     path = f"{settings.api_base}/slo/export"
     response = client.get(f"{path}/csv")
