@@ -41,31 +41,42 @@
           </div>
         {% endif %}
 
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-          {% for alert in alerts %}
-            <div class="col">
-              <div class="card text-center bg-{{ alert.style }}">
-                <div class="card-header">
-                  {% if alert.url %}
-                    <a href="{{ alert.url }}" target="_blank" class="btn btn-{{ alert.style }}">{{ alert.name }}</a>
-                  {% else %}
-                    <span class="btn text-bg-{{ alert.style }}">{{ alert.name }}</span>
-                  {% endif %}
-                  <span class="badge" title="The Alert type">
+        {% if alerts %}
+          <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for alert in alerts %}
+              <div class="col">
+                <div class="card text-center bg-{{ alert.style }}">
+                  <div class="card-header">
+                    {% if alert.url %}
+                      <a href="{{ alert.url }}" target="_blank" class="btn btn-{{ alert.style }}">{{ alert.name }}</a>
+                    {% else %}
+                      <span class="btn text-bg-{{ alert.style }}">{{ alert.name }}</span>
+                    {% endif %}
+                    <span class="badge" title="The Alert type">
                       <i class="fa-solid fa-bell"></i>
                       {{ alert.type }}
                   </span>
-                </div>
-                <div class="card-body">
-                  <p class="card-text text-truncate" title="{{ alert.description }}">{{ alert.description or '-' }}</p>
-                </div>
-                <div class="card-footer text-body-secondary" title="{{ alert.timestamp }}">
-                  {{ alert.timestamp | humanize_naturaltime }}
+                  </div>
+                  <div class="card-body">
+                    <p class="card-text text-truncate"
+                       title="{{ alert.description }}">{{ alert.description or '-' }}</p>
+                  </div>
+                  <div class="card-footer text-body-secondary" title="{{ alert.timestamp }}">
+                    {{ alert.timestamp | humanize_naturaltime }}
+                  </div>
                 </div>
               </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="row">
+            <div class="col">
+              <div class="alert alert-info" role="alert">
+                No alerts found.
+              </div>
             </div>
-          {% endfor %}
-        </div>
+          </div>
+        {% endif %}
       </div>
     </div>
   </section>

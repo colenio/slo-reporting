@@ -1,5 +1,3 @@
-version: "3.7"
-
 x-buildargs: &buildargs
   GIT_COMMIT: ${GIT_COMMIT:-'git-commit'}
   BUILD_VERSION: ${BUILD_VERSION:-'semver'}

@@ -16,14 +16,14 @@
                 Download
               </button>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{{ url_for('export_xlsx').include_query_params(update=True) }}"><i
+                <li><a class="dropdown-item" href="/api/slo/export/xlsx?update=true"><i
                   class="fas fa-file-excel"></i>
                   Excel</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('export_csv').include_query_params(update=True) }}"><i
+                <li><a class="dropdown-item" href="/api/slo/export/csv?update=true"><i
                   class="fas fa-file-csv"></i>
                   CSV</a>
                 </li>
-                <li><a class="dropdown-item" href="{{ url_for('export_json').include_query_params(update=True) }}"><i
+                <li><a class="dropdown-item" href="/api/slo/export/json?update=true"><i
                   class="fas fa-file-code"></i>
                   JSON</a>
                 </li>

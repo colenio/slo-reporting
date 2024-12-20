@@ -44,10 +44,4 @@ def create_app() -> FastAPI:
 app = create_app()
 
 if __name__ == "__main__":
-    if settings.status.enabled:
-        @app.on_event("startup")
-        @repeat_every(seconds=settings.status.interval.total_seconds())
-        def scrape_status() -> None:
-            get_status_service().update()
-
     uvicorn.run(app, host='0.0.0.0', port=8000)

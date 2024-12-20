@@ -21,4 +21,4 @@ class SloPages:
     async def get_slo(self, request: Request):
         slo = self.service.get_slo_values()
         config = settings.ui.slo
-        return get_templates().TemplateResponse(request, "slo.html", {"slo": slo, "config": config})
+        return get_templates().TemplateResponse(request, name="slo.html", context={"slo": slo, "config": config})

@@ -22,4 +22,5 @@ class HomePages:
     @router.get("/about", response_class=HTMLResponse)
     @typing.no_type_check
     async def get_about(self, request: Request):
-        return get_templates().TemplateResponse(request, "about.html", {"settings": settings, "config": settings.ui.about})
+        return get_templates().TemplateResponse(request, name="about.html",
+                                                context={"settings": settings, "config": settings.ui.about})

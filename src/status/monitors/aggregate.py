@@ -22,22 +22,7 @@ class AggregateMonitor(Monitor):
         alerts: List[Alert] = []
         for monitor in self.monitors:
             alerts += monitor.scrape()
-        self.dump_file(alerts)
         return alerts
-
-    def dump_file(self, alerts: List[Alert]) -> None:
-        with open(self.path, mode='wb') as fp:
-            fp.write(self.dump_json(alerts))
-
-    def load_file(self) -> List[Alert]:
-        with open(self.path, mode='rb') as fp:
-            return self.load_json(fp.read())
-
-    def dump_json(self, alerts: List[Alert]) -> bytes:
-        return self.adapter.dump_json(alerts)
-
-    def load_json(self, json: bytes) -> List[Alert]:
-        return self.adapter.validate_json(json)
 
     @staticmethod
     def of_monitors(mon: Monitors) -> 'AggregateMonitor':
@@ -45,5 +30,3 @@ class AggregateMonitor(Monitor):
         monitors += [PrometheusMonitor.of(m) for m in mon.prometheus]
         monitors += [AlertManagerMonitor.of(m) for m in mon.alertmanager]
         return AggregateMonitor(monitors)
-
-

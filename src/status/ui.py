@@ -18,7 +18,7 @@ class StatusPages:
 
     @router.get("/", response_class=HTMLResponse)
     @typing.no_type_check
-    def get_status(self, request: Request, update: bool = False):
-        alerts, _ = self.service.get_status(update)
+    def get_status(self, request: Request):
+        alerts, _ = self.service.get_status()
         config = settings.ui.status
-        return get_templates().TemplateResponse(request, "status.html", {"alerts": alerts, "config": config})
+        return get_templates().TemplateResponse(request, name="status.html", context={"alerts": alerts, "config": config})

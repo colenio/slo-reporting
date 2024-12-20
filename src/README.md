@@ -23,7 +23,7 @@ Requirement already satisfied: certifi==2021.10.8 in ...
 ...
 
 # Update dependencies
-$ python -m pur -r requirements-dev.txt -r requirements-dev.txt
+$ python -m pur -r requirements.txt -r requirements-dev.txt
 All requirements up-to-date.
 ```
 

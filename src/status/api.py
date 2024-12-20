@@ -13,6 +13,6 @@ class StatusController:
     service: StatusService = Depends(get_status_service)
 
     @router.get("/")
-    def get_status(self, update: bool = False) -> JSONResponse:
-        alerts, status_code = self.service.get_status(update)
+    def get_status(self) -> JSONResponse:
+        alerts, status_code = self.service.get_status()
         return JSONResponse(content=jsonable_encoder(alerts), status_code=status_code)
