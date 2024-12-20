@@ -1,17 +1,17 @@
-FROM python:3-slim as base
+FROM python:3-slim AS base
 WORKDIR /app
 
-FROM base as deps
+FROM base AS deps
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-FROM deps as test
+FROM deps AS test
 COPY requirements-dev.txt ./
 RUN pip install --no-cache-dir -r requirements-dev.txt
 COPY . .
 RUN python -m pytest --mypy --cov --cov-fail-under=75
 
-FROM deps as final
+FROM deps AS final
 COPY . .
 # Dummy dependency to prevent optimizing away the test stage (Buildkit)
 COPY --from=test /app/README.md ./README.md
