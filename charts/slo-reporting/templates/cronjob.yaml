@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}-update
 spec:
   concurrencyPolicy: Forbid
-  schedule: "{{ .schedule }}"
+  schedule: "{{ .Values.config.metrics.cronjob.schedule }}"
   jobTemplate:
     spec:
       template:
