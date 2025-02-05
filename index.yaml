@@ -2,6 +2,27 @@ apiVersion: v1
 entries:
   slo-reporting:
   - apiVersion: v2
+    appVersion: 0.3.31
+    created: "2025-02-05T15:04:46.741491123Z"
+    description: Excel compatible SLO reporting tool for Prometheus / Pyrra.
+    digest: c26fa966acc55855d18232ec226a647ab0a1f95181361dea8dcbef3d054b441b
+    home: https://github.com/colenio/slo-reporting
+    icon: https://colenio.com/img/favicon-32x32.png
+    keywords:
+    - colenio
+    kubeVersion: '>= 1.26.3'
+    maintainers:
+    - email: support@colenio.com
+      name: Colenio
+      url: https://colenio.com
+    name: slo-reporting
+    sources:
+    - https://github.com/colenio/slo-reporting
+    type: application
+    urls:
+    - https://github.com/colenio/slo-reporting/releases/download/slo-reporting-0.3.34/slo-reporting-0.3.34.tgz
+    version: 0.3.34
+  - apiVersion: v2
     appVersion: 0.3.33
     created: "2025-02-05T14:37:21.17789551Z"
     description: Excel compatible SLO reporting tool for Prometheus / Pyrra.
@@ -463,4 +484,4 @@ entries:
     urls:
     - https://github.com/colenio/slo-reporting/releases/download/slo-reporting-0.1.0/slo-reporting-0.1.0.tgz
     version: 0.1.0
-generated: "2025-02-05T14:37:21.178068383Z"
+generated: "2025-02-05T15:04:46.741623179Z"
