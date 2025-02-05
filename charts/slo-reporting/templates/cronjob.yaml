@@ -1,11 +1,9 @@
-{{- with .Values.config.metrics.cronjob }}
-  {{- if .enabled }}
+{{- if .Values.config.metrics.cronjob.enabled }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: {{ include "slo-reporting.fullname" $ }}-update
   labels:
-    {{- include "slo-reporting.labels" $ | nindent 4 }}
     app.kubernetes.io/name: {{ .Release.Name }}-update
     app.kubernetes.io/instance: {{ .Release.Name }}-update
 spec:
@@ -27,6 +25,5 @@ spec:
               args:
                 - '-X'
                 - 'POST'
-                - 'http://{{ include "slo-reporting.fullname" $ }}:{{ $.Values.service.port }}/api/slo/_update'
-  {{- end }}
+                - 'http://{{ include "slo-reporting.fullname" $ }}:{{ .Values.service.port }}/api/slo/_update'
 {{- end }}
