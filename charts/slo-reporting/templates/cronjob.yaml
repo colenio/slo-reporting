@@ -6,6 +6,8 @@ metadata:
   name: {{ include "slo-reporting.fullname" $ }}-update
   labels:
     {{- include "slo-reporting.labels" $ | nindent 4 }}
+    app.kubernetes.io/name: {{ .Release.Name }}-update
+    app.kubernetes.io/instance: {{ .Release.Name }}-update
 spec:
   concurrencyPolicy: Forbid
   schedule: "{{ .schedule }}"
@@ -14,7 +16,8 @@ spec:
       template:
         metadata:
           labels:
-            {{- include "slo-reporting.labels" $ | nindent 12 }}
+            app.kubernetes.io/name: {{ .Release.Name }}-update
+            app.kubernetes.io/instance: {{ .Release.Name }}-update
         spec:
           restartPolicy: Never
           containers:
