@@ -26,4 +26,16 @@ spec:
                 - '-X'
                 - 'POST'
                 - 'http://{{ include "slo-reporting.fullname" $ }}:{{ .Values.service.port }}/api/slo/_update'
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
 {{- end }}
